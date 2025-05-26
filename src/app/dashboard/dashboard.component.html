@@ -1,89 +1,145 @@
 <!-- Navigation bar component -->
 <app-navbar></app-navbar>
 
-<!-- Main layout with sidebar and content area -->
-<div class="flex h-screen bg-gray-100 pt-16">
-  <!-- Sidebar/drawer navigation that collapses -->
-  <div 
-    class="sidebar bg-gray-900 text-white transition-all duration-300 overflow-hidden" 
-    [ngClass]="{'w-64': isDrawerOpen, 'w-16': !isDrawerOpen}"
-  >
-    <!-- Drawer toggle button -->
-    <div class="flex justify-end p-4">
-      <button (click)="toggleDrawer()" class="text-white">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path *ngIf="isDrawerOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          <path *ngIf="!isDrawerOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
-    
-    <!-- Navigation links (only visible when drawer is open) -->
-    <div class="px-4" *ngIf="isDrawerOpen">
-      <nav class="space-y-2">
-        <!-- Chores navigation link -->
-        <a 
-          routerLink="/dashboard/chores" 
-          routerLinkActive="bg-blue-600 text-white" 
-          class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <span>Chores</span>
-        </a>
-        
-        <!-- Pantry navigation link -->
-        <a 
-          routerLink="/dashboard/pantry" 
-          routerLinkActive="bg-blue-600 text-white" 
-          class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span>Pantry</span>
-        </a>
+<!-- Main layout with animated background and themed styling -->
+<div class="min-h-screen flex relative pt-16">
+  <!-- Animated Background (same as landing page) -->
+  <!-- <svg class="fixed top-0 left-0 w-full h-screen -z-10" preserveAspectRatio="xMidYMid slice" viewBox="10 10 80 80">
+    <defs>
+      <filter id="blur">
+        <feGaussianBlur stdDeviation="1"/>
+      </filter>
+      <style>
+        @keyframes rotate {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        .out-top {
+          animation: rotate 20s linear infinite;
+          transform-origin: 13px 25px;
+        }
+        .in-top {
+          animation: rotate 10s linear infinite;
+          transform-origin: 13px 25px;
+        }
+        .out-bottom {
+          animation: rotate 25s linear infinite;
+          transform-origin: 84px 93px;
+        }
+        .in-bottom {
+          animation: rotate 15s linear infinite;
+          transform-origin: 84px 93px;
+        }
+      </style>
+    </defs>
+    <path fill="#578FCA" class="out-top" filter="url(#blur)" d="M37-5C25.1-14.7,5.7-19.1-9.2-10-28.5,1.8-32.7,31.1-19.8,49c15.5,21.5,52.6,22,67.2,2.3C59.4,35,53.7,8.5,37-5Z"/>
+    <path fill="#A1E3F9" class="in-top" filter="url(#blur)" d="M20.6,4.1C11.6,1.5-1.9,2.5-8,11.2-16.3,23.1-8.2,45.6,7.4,50S42.1,38.9,41,24.5C40.2,14.1,29.4,6.6,20.6,4.1Z"/>
+    <path fill="#578FCA" class="out-bottom" filter="url(#blur)" d="M105.9,48.6c-12.4-8.2-29.3-4.8-39.4.8-23.4,12.8-37.7,51.9-19.1,74.1s63.9,15.3,76-5.6c7.6-13.3,1.8-31.1-2.3-43.8C117.6,63.3,114.7,54.3,105.9,48.6Z"/>
+    <path fill="#A1E3F9" class="in-bottom" filter="url(#blur)" d="M102,67.1c-9.6-6.1-22-3.1-29.5,2-15.4,10.7-19.6,37.5-7.6,47.8s35.9,3.9,44.5-12.5C115.5,92.6,113.9,74.6,102,67.1Z"/>
+  </svg> -->
 
-        <!-- Shopping Cart navigation link -->
-        <a 
-          routerLink="/dashboard/shopping-cart" 
-          routerLinkActive="bg-blue-600 text-white" 
-          class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span>Shopping Cart</span>
-        </a>
-      </nav>
-    </div>
-  </div>
+  <!-- Sidebar/drawer navigation with themed styling -->
+
   
-  <!-- Main content area -->
+  <!-- Main content area with themed styling -->
   <div class="flex-1 overflow-auto p-6">
-    <!-- Loading spinner -->
+    <!-- Loading spinner with theme -->
     <div *ngIf="loading" class="flex justify-center items-center h-full">
-      <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-950 border-t-transparent"></div>
     </div>
     
-    <!-- Error message display -->
-    <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-      <span class="block sm:inline">{{ error }}</span>
+    <!-- Error message with theme -->
+    <div *ngIf="error" class="bg-red-500/10 backdrop-blur-sm border border-red-500/30 text-red-800 px-4 py-4 rounded-xl shadow-lg" role="alert">
+      <span class="block sm:inline font-medium">{{ error }}</span>
     </div>
     
-    <!-- Dashboard content (only shown when data is loaded) -->
-    <div *ngIf="!loading && !error">
-      <h1 class="text-3xl font-teko font-bold mb-6">Dashboard</h1>
+    <!-- Dashboard content with themed styling -->
+    <div *ngIf="!loading && !error" class="space-y-6">
+      <!-- Dashboard title with cribb branding -->
+      <!-- <div class="text-center mb-8">
+        <h1 
+          class="text-5xl md:text-6xl font-loopet text-blue-950 mb-2"
+          style="text-shadow: -2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white, 2px 2px 0 white, -2px 0 0 white, 2px 0 0 white, 0 -2px 0 white, 0 2px 0 white;"
+        >
+          cribb.
+        </h1>
+        <p class="text-lg font-semibold text-blue-950/90">Dashboard</p>
+      </div> -->
       
-      <!-- User welcome card with household info -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-2xl font-teko font-semibold mb-2">Welcome, {{ user?.firstName }}!</h2>
-        <p class="text-gray-600">Group: {{ user?.groupName || 'Not set' }} | Room No: {{ user?.roomNo || 'Not set' }}</p>
+      <!-- Compact welcome banner positioned at top-right -->
+      <div class="flex justify-between items-center mb-6">
+        <div class="bg-white backdrop-blur-md rounded-xl shadow-lg border-2 border-blue-950 px-4 py-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-medium text-blue-950">Welcome, {{ user?.firstName }}!</span>
+            <svg class="w-5 h-5 fill-red-500" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+              <path d="M289.229309,133.754211 
+                C348.834595,130.966995 395.678223,155.912903 434.963348,198.025558 
+                C456.886536,221.526627 473.043579,248.439301 483.360229,278.871246 
+                C483.884125,280.416565 484.570679,281.906738 485.457886,284.108459 
+                C489.151398,275.011200 492.317932,266.481354 496.029266,258.195526 
+                C513.238098,219.775742 538.102173,187.546265 573.760864,164.524902 
+                C599.251709,148.067932 627.302124,138.655701 657.680603,136.626755 
+                C723.719055,132.216110 775.830505,158.942444 816.871826,209.049072 
+                C829.706421,224.718552 843.101135,240.074173 853.315796,257.832062 
+                C869.249756,285.532806 878.550720,315.245575 882.443726,346.865509 
+                C885.154663,368.884705 886.822510,390.945007 886.047180,413.114166 
+                C884.340820,461.902985 875.511475,509.093292 852.232544,552.592041 
+                C827.483398,598.837769 796.522034,640.628784 760.323303,678.601562 
+                C700.320557,741.544983 630.143799,789.983093 550.990417,825.554138 
+                C498.047943,849.346252 442.921753,866.111572 385.584167,875.467102 
+                C381.988739,876.053772 378.489441,877.259705 374.966492,878.252319 
+                C371.722565,879.166321 368.410065,879.765747 367.041046,875.719238 
+                C365.778015,871.986084 368.580536,870.403809 371.457489,869.047180 
+                C386.975861,861.729004 402.587311,854.597534 417.965729,846.995056 
+                C513.249695,799.889954 600.454102,741.382874 674.143127,664.078491 
+                C714.954468,621.264832 749.856506,574.121521 776.175049,520.935120 
+                C793.627563,485.665894 806.577942,448.843231 812.257446,409.809937 
+                C818.215637,368.861359 818.163879,328.134979 803.664429,288.603149 
+                C791.307861,254.913803 771.269287,226.872650 741.974670,205.649536 
+                C732.994324,199.143585 722.638489,197.676590 712.315247,196.411072 
+                C663.371033,190.411087 619.730103,204.362686 580.303894,232.834015 
+                C550.747253,254.178101 526.255371,280.228485 508.770233,312.482269 
+                C502.960602,323.199005 498.034760,334.288727 494.905701,346.121826 
+                C494.452545,347.835541 494.163025,349.804749 491.975586,350.420166 
+                C490.365906,350.872986 489.367798,350.395264 487.060211,347.893585 
+                C484.803467,354.621582 483.678284,361.505066 482.194641,368.304749 
+                C481.509552,371.444519 481.518341,375.538330 476.735870,375.264282 
+                C471.708557,374.976257 472.033203,370.789337 471.901093,367.389923 
+                C470.733673,337.349701 465.113800,308.198578 453.516663,280.437683 
+                C431.812866,228.483749 396.165344,190.493744 340.878571,175.037582 
+                C292.390656,161.482162 249.540817,173.190445 214.667984,210.264008 
+                C198.899353,227.027740 191.559738,247.748886 189.320953,270.372284 
+                C184.712173,316.945160 194.878616,361.062500 212.333633,403.783875 
+                C234.835098,458.856567 262.105865,511.401886 296.508118,560.107361 
+                C329.685059,607.078003 369.078461,648.294983 412.291107,686.018860 
+                C416.684418,689.854065 421.088745,693.677795 425.423737,697.578186 
+                C427.542847,699.484924 428.151428,701.880249 426.335236,704.244568 
+                C424.494537,706.640747 422.154510,706.484680 419.686096,704.946533 
+                C384.648743,683.113220 347.866364,664.105530 314.874878,638.955750 
+                C271.481018,605.876038 232.851791,568.319214 202.587936,522.625916 
+                C174.999649,480.972412 156.506119,435.630341 147.930542,386.387390 
+                C142.309174,354.108337 143.243637,321.832855 148.900223,289.591156 
+                C150.677948,279.458496 149.945007,269.055511 151.505920,258.809998 
+                C159.526978,206.161560 188.954285,169.933273 236.352768,147.408401 
+                C252.912292,139.538925 270.559387,135.527206 289.229309,133.754211z"/>
+            </svg>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2 mt-1 text-sm text-blue-950/80">
+            <span><span class="opacity-75">Group:</span> {{ user?.groupName || 'Not set' }}</span>
+            <span class="hidden sm:inline">•</span>
+            <span><span class="opacity-75">Room:</span> {{ user?.roomNo || 'Not set' }}</span>
+          </div>
+        </div>
       </div>
       
-      <!-- Child route outlet for feature components (chores, pantry, etc) -->
-      <router-outlet></router-outlet>
+      <!-- Child route outlet container with glass effect -->
+      <div class="bg-white/10 rounded-xl border border-white/20 min-h-[60vh]">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </div>
 </div>

@@ -1,39 +1,84 @@
-<nav class="fixed top-0 left-0 w-full z-50 bg-white  dark:bg-gray-900 shadow-md border-b-4 border-gray-200">
-    <div class="flex flex-wrap items-center justify-between p-4 ">
-      <a routerLink="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-        <span class="self-center text-2xl font-teko font-semibold whitespace-nowrap dark:text-white">CRIBB</span>
+<nav class="fixed top-0 left-0 w-full z-50 shadow-sm">
+  <div class="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center">
+      <span class="text-2xl font-loopet text-blue-950" style="text-shadow: -2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white, 2px 2px 0 white, -2px 0 0 white, 2px 0 0 white, 0 -2px 0 white, 0 2px 0 white;">cribb.</span>
+    </a>
+
+    <!-- Navigation Buttons (Center) -->
+    <div class="flex items-center space-x-3">
+      <a routerLink="/dashboard/chores" class="nav-pill" routerLinkActive="active">
+        chores
       </a>
-      <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       
-        <!-- Notification Dropdown -->
-        <div class="mr-4 relative" #notificationContainer>
-          <app-notification-dropdown></app-notification-dropdown>
-        </div>
-        
-        <!-- User Menu -->
-        <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" (click)="toggleMenu()">
-          <span class="sr-only">Open user menu</span>
-          <div class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white font-medium">
-            {{ userName.charAt(0) }}
-          </div>
+      <a routerLink="/dashboard/pantry" class="nav-pill" routerLinkActive="active">
+        pantry
+      </a>
+      
+      <a routerLink="/dashboard/shopping-cart" class="nav-pill" routerLinkActive="active">
+        shopping cart
+      </a>
+    </div>
+
+    <!-- Right side: Notifications and Profile -->
+    <div class="flex items-center space-x-4">
+      <!-- Notification Bell -->
+      <button class="text-blue-950 bg-white rounded-full p-1 border-2 border-blue-950 hover:text-gray-300 transition-colors">
+        <svg class="w-5 h-5 fill-blue-950" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-3.403-3.403A2.953 2.953 0 0116 12.5V9a4 4 0 00-8 0v3.5a2.953 2.953 0 01-.597 1.796L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
+      </button>
+      
+      <!-- Profile Menu -->
+      <div class="relative">
+        <button 
+          type="button" 
+          class="w-8 h-8 rounded-full bg-blue-500 text-white font-medium text-sm hover:bg-blue-600 transition-colors flex items-center justify-center" 
+          id="user-menu-button" 
+          aria-expanded="false" 
+          (click)="toggleMenu()"
+        >
+          {{ userName.charAt(0) }}
         </button>
+        
         <!-- Dropdown menu -->
-        <div [ngClass]="{'hidden': !isMenuOpen}" class="z-50 absolute top-12 right-4 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-          <div class="px-4 py-3">
-            <span class="block text-sm text-gray-900 dark:text-white">{{ userName }}</span>
+        <div 
+          [ngClass]="{'hidden': !isMenuOpen, 'block': isMenuOpen}" 
+          class="absolute right-0 top-10 z-50 w-48 bg-white rounded-lg shadow-lg border border-gray-200"
+        >
+          <div class="px-4 py-3 border-b border-gray-100">
+            <span class="block text-sm font-medium text-gray-900">{{ userName }}</span>
           </div>
-          <ul class="py-2" aria-labelledby="user-menu-button">
+          <ul class="py-1">
             <li>
-              <a routerLink="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Dashboard</a>
+              <a 
+                routerLink="/dashboard" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                (click)="toggleMenu()"
+              >
+                Dashboard
+              </a>
             </li>
             <li>
-              <a routerLink="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profile</a>
+              <a 
+                routerLink="/profile" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                (click)="toggleMenu()"
+              >
+                Profile
+              </a>
             </li>
             <li>
-              <button (click)="signOut()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</button>
+              <button 
+                (click)="signOut()" 
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Sign out
+              </button>
             </li>
           </ul>
         </div>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>

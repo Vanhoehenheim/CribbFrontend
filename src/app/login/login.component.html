@@ -1,7 +1,7 @@
 <div class="min-h-screen flex flex-col items-center justify-center space-y-6 px-4">
   <!-- Main heading -->
   <div class="text-center">
-    <h1 class="text-8xl fancy font-teko tracking-wide font-bold text-gray-900 mb-2">
+    <h1 class="text-8xl fancy font-teko tracking-wide font-bold text-gray-900 mb-14">
       LOGIN
     </h1>
   </div>
@@ -59,7 +59,7 @@
       {{ errorMessage }}
     </div>
 
-    <button type="submit" [disabled]="loading" class="btn-primary btn-flex">
+    <button type="submit" [disabled]="loading" class="btn-primary btn-flex w-1/2 mx-auto">
       <span *ngIf="!loading">Sign in</span>
       <span *ngIf="loading">Signing in...</span>
     </button>

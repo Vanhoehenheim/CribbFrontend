@@ -1,0 +1,22 @@
+/* Navigation pill styles */
+.nav-pill {
+  @apply px-3 py-1 text-sm font-bold text-black
+         rounded-full 
+         border-2 border-blue-950
+         bg-white
+         hover:bg-slate-500 hover:text-white
+         transition-all duration-200 ease-in-out
+         focus:outline-none;
+}
+
+/* Active state for current route */
+.nav-pill.active {
+  @apply bg-slate-900 text-white;
+}
+
+/* Mobile menu styles */
+@media (max-width: 768px) {
+  .nav-pill {
+    @apply w-full justify-center mb-2;
+  }
+}
