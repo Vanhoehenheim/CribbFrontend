@@ -9,6 +9,8 @@ module.exports = {
       sans: ['"Nunito Sans", serif'], // body
       teko: ['"Teko", serif'], // heading
       fancy: ['"Fascinate", system-ui'], // heading
+      mogra: ['"Mogra", system-ui'], // heading
+      loopet: ['"Playwrite DK Loopet", system-ui'], // heading
     },
     extend: {
       backgroundImage: {
