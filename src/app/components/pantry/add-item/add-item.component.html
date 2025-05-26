@@ -1,0 +1,77 @@
+<!-- Add item form container -->
+<div class="bg-white rounded-lg">
+  <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="space-y-4">
+    <!-- Item name input field -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700">Item Name</label>
+      <input
+        type="text"
+        id="name"
+        formControlName="name"
+        class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        placeholder="e.g., Milk">
+    </div>
+
+    <!-- Quantity amount input field -->
+    <div>
+      <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+      <input
+        type="number"
+        id="quantity"
+        formControlName="quantity"
+        class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        placeholder="e.g., 2">
+    </div>
+
+    <!-- Unit of measurement input field -->
+    <div>
+      <label for="unit" class="block text-sm font-medium text-gray-700">Unit</label>
+      <input
+        type="text"
+        id="unit"
+        formControlName="unit"
+        class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        placeholder="e.g., gallons">
+    </div>
+
+    <!-- Optional category classification -->
+    <div>
+      <label for="category" class="block text-sm font-medium text-gray-700">Category (Optional)</label>
+      <input
+        type="text"
+        id="category"
+        formControlName="category"
+        class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        placeholder="e.g., Dairy">
+    </div>
+
+    <!-- Optional expiration date picker -->
+    <div>
+      <label for="expiration_date" class="block text-sm font-medium text-gray-700">Expiration Date (Optional)</label>
+      <input
+        type="date"
+        id="expiration_date"
+        formControlName="expiration_date"
+        class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      <p class="text-xs text-gray-500 mt-1">Date will be automatically formatted to ISO 8601 standard</p>
+    </div>
+
+    <!-- Error message display -->
+    <div *ngIf="error" class="text-red-600 text-sm py-2">
+      {{error}}
+    </div>
+
+    <!-- Success message display -->
+    <div *ngIf="success" class="text-green-600 text-sm py-2">
+      Item added successfully!
+    </div>
+
+    <!-- Form submission button -->
+    <button
+      type="submit"
+      [disabled]="!itemForm.valid || loading"
+      class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+      {{loading ? 'Adding...' : 'Add Item'}}
+    </button>
+  </form>
+</div> 

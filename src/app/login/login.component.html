@@ -1,0 +1,71 @@
+<div class="min-h-screen flex flex-col items-center justify-center space-y-6 px-4">
+  <!-- Main heading -->
+  <div class="text-center">
+    <h1 class="text-8xl fancy font-teko tracking-wide font-bold text-gray-900 mb-2">
+      LOGIN
+    </h1>
+  </div>
+  
+  <!-- Input fields form with validation -->
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col w-full max-w-md gap-6">
+    <!-- Username input with icon -->
+    <div class="flex flex-col">
+      <div class="relative flex items-center">
+        <span class="absolute left-4 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </span>
+        <input 
+          type="text" 
+          formControlName="username"
+          placeholder="Username" 
+          class="bg-gray-100 border-2 border-blue-950 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-4 pl-12"
+          [ngClass]="{ 'border-red-500 border-2': submitted && f['username'].errors }">
+      </div>
+      <div *ngIf="submitted && f['username'].errors" class="text-red-500 text-sm mt-1">
+        <span *ngIf="f['username'].errors['required']">Username is required</span>
+      </div>
+    </div>
+
+    <!-- Password input with icon -->
+    <div class="flex flex-col">
+      <div class="relative flex items-center">
+        <span class="absolute left-4 text-gray-500">
+          <ng-icon name="ionLockClosed" />
+        </span>
+        <input 
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password" 
+          placeholder="Password" 
+          class="bg-gray-100 border-2 border-blue-950 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-4 pl-12"
+          [ngClass]="{ 'border-red-500 border-2': submitted && f['password'].errors }">
+        <button 
+          type="button" 
+          class="absolute right-4 text-gray-500"
+          (click)="togglePasswordVisibility()">
+          <ng-icon [name]="showPassword ? 'ionEyeOffOutline' : 'ionEyeOutline'"></ng-icon>
+        </button>
+      </div>
+      <div *ngIf="submitted && f['password'].errors" class="text-red-500 text-sm mt-1">
+        <span *ngIf="f['password'].errors['required']">Password is required</span>
+        <span *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</span>
+      </div>
+    </div>
+
+    <!-- Display error message from server -->
+    <div *ngIf="errorMessage" class="text-red-500 text-sm mt-1">
+      {{ errorMessage }}
+    </div>
+
+    <button type="submit" [disabled]="loading" class="btn-primary btn-flex">
+      <span *ngIf="!loading">Sign in</span>
+      <span *ngIf="loading">Signing in...</span>
+    </button>
+  </form>
+
+  <!-- Decorative elements -->
+  <div class="absolute top-0 right-0 w-64 h-64 bg-grey-50 rounded-full blur-3xl opacity-50 -z-10"></div>
+  <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-30 -z-10"></div>
+</div>
