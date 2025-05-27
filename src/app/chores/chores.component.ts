@@ -480,16 +480,35 @@ export class ChoresComponent implements OnInit {
    * Used in template to determine which chores to display
    */
   get filteredChores(): Chore[] {
+    let filtered: Chore[];
+    
     switch (this.activeTab) {
       case 'yours':
-        return this.chores.filter(chore => this.isYourTurn(chore));
+        filtered = this.chores.filter(chore => this.isYourTurn(chore));
+        break;
       case 'overdue':
-        return this.chores.filter(chore => chore.status === 'overdue');
+        filtered = this.chores.filter(chore => chore.status === 'overdue');
+        break;
       case 'completed':
-        return this.chores.filter(chore => chore.status === 'completed');
+        filtered = this.chores.filter(chore => chore.status === 'completed');
+        break;
       default:
-        return this.chores;
+        filtered = this.chores;
     }
+    
+    // Sort chores: overdue first, then pending, then completed
+    return filtered.sort((a, b) => {
+      const statusOrder = { 'overdue': 0, 'pending': 1, 'completed': 2 };
+      const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 1;
+      const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 1;
+      
+      if (aOrder !== bOrder) {
+        return aOrder - bOrder;
+      }
+      
+      // If same status, sort by due date (earliest first)
+      return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+    });
   }
   
   /**

@@ -1,17 +1,19 @@
-<!-- Glass morphism container with themed styling -->
+<!-- Main container with glass morphism styling -->
 <div class="bg-white rounded-xl border-2 border-blue-950 overflow-hidden">
-  <!-- Header with themed gradient -->
-  <div class="p-4 text-white flex justify-between items-center">
-    <h2 class="text-2xl fancy font-bold font-loopet text-blue-950">Group Chores</h2>
+  
+  <!-- ===== HEADER SECTION ===== -->
+  <div class="p-4 text-white flex justify-center items-center relative">
+    <h2 class="text-2xl inside-fancy font-bold font-loopet text-blue-950">Group Chores</h2>
+    <!-- Add/Cancel chore button -->
     <button
       (click)="toggleNewChoreForm()"
-      class="btn btn-primary px-4 py-2 border-2 border-blue-950"
+      class="btn btn-primary px-4 py-2 border-2 border-blue-950 absolute right-4"
     >
       {{ showNewChoreForm ? "Cancel" : "+ Add Chore" }}
     </button>
   </div>
 
-  <!-- Tabs with glass morphism -->
+  <!-- ===== FILTER TABS ===== -->
   <div class="bg-white/10 px-4 py-3">
     <div class="flex space-x-4">
       <button
@@ -57,202 +59,206 @@
     </div>
   </div>
 
-  <!-- New Chore Form with glass morphism -->
-  <div *ngIf="showNewChoreForm" class="p-4 border-b border-blue-950/20 bg-white/10 backdrop-blur-sm">
-    <h3 class="text-xl font-semibold mb-4 text-blue-950">Add New Chore</h3>
-
-    <!-- Toggle between individual and recurring chores -->
-    <div class="flex space-x-4 mb-6">
-      <button
-        (click)="isRecurringChore = false"
-        class="flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-150 backdrop-blur-sm"
-        [ngClass]="{
-          'bg-[#578FCA] text-white shadow-lg': !isRecurringChore,
-          'bg-white/20 text-blue-950 border border-blue-950/30': isRecurringChore
-        }"
-      >
-        Individual Chore
-      </button>
-      <button
-        (click)="isRecurringChore = true"
-        class="flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-150 backdrop-blur-sm"
-        [ngClass]="{
-          'bg-[#578FCA] text-white shadow-lg': isRecurringChore,
-          'bg-white/20 text-blue-950 border border-blue-950/30': !isRecurringChore
-        }"
-      >
-        Recurring Chore
-      </button>
-    </div>
-
-    <!-- Individual Chore Form -->
-    <div *ngIf="!isRecurringChore" class="space-y-4">
-      <!-- Chore Title -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Chore Title*
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="newIndividualChore.title"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-          placeholder="e.g. Clean Kitchen"
-        />
-      </div>
-
-      <!-- Description -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Description
-        </label>
-        <textarea
-          [(ngModel)]="newIndividualChore.description"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-          placeholder="Describe what needs to be done"
-          rows="2"
-        ></textarea>
-      </div>
-
-      <!-- Assigned To -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Assign To*
-        </label>
-        <select
-          [(ngModel)]="newIndividualChore.assigned_to"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-        >
-          <option value="">-- Select Roommate --</option>
-          <option
-            *ngFor="let roommate of availableRoommates"
-            [value]="roommate.username"
+  <!-- ===== NEW CHORE MODAL ===== -->
+  <div *ngIf="showNewChoreForm" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-lg border-2 border-blue-950/30 rounded-2xl shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-white/95 backdrop-blur-lg border-b border-blue-950/20 p-6 rounded-t-2xl">
+        <div class="flex items-center justify-center relative">
+          <h3 class="text-xl fancy font-bold font-loopet text-blue-950 relative">Add New Chore</h3>
+          <!-- Close button -->
+          <button
+            (click)="toggleNewChoreForm()"
+            class="p-2 hover:bg-blue-950/10 rounded-full transition-all duration-200 absolute right-4"
           >
-            {{ roommate.name }}
-          </option>
-        </select>
+            <svg class="w-6 h-6 text-blue-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Due Date -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Due Date*
-        </label>
-        <input
-          type="date"
-          [(ngModel)]="newIndividualChore.due_date"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-        />
+      <!-- Modal Content -->
+      <div class="p-6">
+        <!-- Chore Type Toggle (Individual vs Recurring) -->
+        <div class="flex space-x-3 mb-8 bg-white/20 backdrop-blur-sm border-2 border-blue-950 rounded-xl p-1">
+          <button
+            (click)="isRecurringChore = false"
+            class="flex-1 py-3 text-sm font-bold rounded-lg transition-all duration-200 backdrop-blur-sm"
+            [ngClass]="{
+              'bg-[#578FCA] text-white shadow-lg border-2 border-blue-950': !isRecurringChore,
+              'bg-transparent text-blue-950 hover:bg-white/20': isRecurringChore
+            }"
+          >
+            Individual Chore
+          </button>
+          <button
+            (click)="isRecurringChore = true"
+            class="flex-1 py-3 text-sm font-bold rounded-lg transition-all duration-200 backdrop-blur-sm"
+            [ngClass]="{
+              'bg-[#578FCA] text-white shadow-lg border-2 border-blue-950': isRecurringChore,
+              'bg-transparent text-blue-950 hover:bg-white/20': !isRecurringChore
+            }"
+          >
+            Recurring Chore
+          </button>
+        </div>
+
+        <!-- Individual Chore Form -->
+        <div *ngIf="!isRecurringChore" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Title Field -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-blue-950 mb-2">Chore Title*</label>
+              <input
+                type="text"
+                [(ngModel)]="newIndividualChore.title"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+                placeholder="e.g. Clean Kitchen"
+              />
+            </div>
+
+            <!-- Description Field -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-blue-950 mb-2">Description</label>
+              <textarea
+                [(ngModel)]="newIndividualChore.description"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 resize-none"
+                placeholder="Describe what needs to be done"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <!-- Assignment Field -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Assign To*</label>
+              <select
+                [(ngModel)]="newIndividualChore.assigned_to"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+              >
+                <option value="">-- Select Roommate --</option>
+                <option *ngFor="let roommate of availableRoommates" [value]="roommate.username">
+                  {{ roommate.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Due Date Field -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Due Date*</label>
+              <input
+                type="date"
+                [(ngModel)]="newIndividualChore.due_date"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+              />
+            </div>
+
+            <!-- Points Field -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-blue-950 mb-2">Points</label>
+              <input
+                type="number"
+                [(ngModel)]="newIndividualChore.points"
+                min="1"
+                max="10"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+              />
+              <p class="text-sm text-blue-950/80 mt-2 font-medium">
+                Points earned when this chore is completed (1-10)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recurring Chore Form -->
+        <div *ngIf="isRecurringChore" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Title Field -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-blue-950 mb-2">Chore Title*</label>
+              <input
+                type="text"
+                [(ngModel)]="newRecurringChore.title"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+                placeholder="e.g. Take Out Trash"
+              />
+            </div>
+
+            <!-- Description Field -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-blue-950 mb-2">Description</label>
+              <textarea
+                [(ngModel)]="newRecurringChore.description"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 resize-none"
+                placeholder="Describe what needs to be done"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <!-- Frequency Field -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Frequency*</label>
+              <select
+                [(ngModel)]="newRecurringChore.frequency"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+              >
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="biweekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+              <p class="text-sm text-blue-950/80 mt-2 font-medium">
+                This chore will rotate among all group members based on this frequency
+              </p>
+            </div>
+
+            <!-- Points Field -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Points</label>
+              <input
+                type="number"
+                [(ngModel)]="newRecurringChore.points"
+                min="1"
+                max="10"
+                class="w-full px-4 py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200"
+              />
+              <p class="text-sm text-blue-950/80 mt-2 font-medium">
+                Points earned when this chore is completed (1-10)
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Points -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Points
-        </label>
-        <input
-          type="number"
-          [(ngModel)]="newIndividualChore.points"
-          min="1"
-          max="10"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-        />
-        <p class="text-sm text-blue-950/70 mt-1">
-          Points earned when this chore is completed (1-10)
-        </p>
+      <!-- Modal Footer -->
+      <div class="sticky bottom-0 bg-white/95 backdrop-blur-lg border-t border-blue-950/20 p-6 rounded-b-2xl">
+        <div class="flex justify-center space-x-4">
+          <button
+            type="button"
+            (click)="resetChoreForm()"
+            class="btn btn-sm px-2 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-red-500 backdrop-blur-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="createNewChore()"
+            class="btn btn-sm px-2 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950 backdrop-blur-sm"
+          >
+            Create Chore
+          </button>
+        </div>
       </div>
-    </div>
-
-    <!-- Recurring Chore Form -->
-    <div *ngIf="isRecurringChore" class="space-y-4">
-      <!-- Chore Title -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Chore Title*
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="newRecurringChore.title"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-          placeholder="e.g. Take Out Trash"
-        />
-      </div>
-
-      <!-- Description -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Description
-        </label>
-        <textarea
-          [(ngModel)]="newRecurringChore.description"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-          placeholder="Describe what needs to be done"
-          rows="2"
-        ></textarea>
-      </div>
-
-      <!-- Frequency -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Frequency*
-        </label>
-        <select
-          [(ngModel)]="newRecurringChore.frequency"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-        >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="biweekly">Bi-weekly</option>
-          <option value="monthly">Monthly</option>
-        </select>
-        <p class="text-sm text-blue-950/70 mt-1">
-          This chore will rotate among all group members based on this frequency
-        </p>
-      </div>
-
-      <!-- Points -->
-      <div>
-        <label class="block text-sm font-medium text-blue-950 mb-1">
-          Points
-        </label>
-        <input
-          type="number"
-          [(ngModel)]="newRecurringChore.points"
-          min="1"
-          max="10"
-          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
-        />
-        <p class="text-sm text-blue-950/70 mt-1">
-          Points earned when this chore is completed (1-10)
-        </p>
-      </div>
-    </div>
-    <!-- Action Buttons -->
-    <div class="flex justify-end space-x-3 pt-4">
-      <button
-        type="button"
-        (click)="resetChoreForm()"
-        class="px-4 py-2 text-sm font-medium text-blue-950 bg-white/30 hover:bg-white/50 rounded-lg transition-all duration-150 border border-blue-950/30 backdrop-blur-sm"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        (click)="createNewChore()"
-        class="px-4 py-2 text-sm font-medium text-white bg-[#578FCA] hover:bg-[#578FCA]/80 rounded-lg transition-all duration-150 shadow-lg"
-      >
-        Create Chore
-      </button>
     </div>
   </div>
 
-  <!-- Loading state -->
+  <!-- ===== LOADING STATE ===== -->
   <div *ngIf="loading" class="flex justify-center items-center p-8">
-    <div
-      class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#578FCA]"
-    ></div>
+    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#578FCA]"></div>
   </div>
 
-  <!-- Error message -->
+  <!-- ===== ERROR MESSAGE ===== -->
   <div
     *ngIf="error"
     class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-4 py-3 rounded-lg mx-4 my-4"
@@ -261,49 +267,50 @@
     <span class="block sm:inline font-medium">⚠️ {{ error }}</span>
   </div>
 
-  <!-- Enhanced Empty state -->
+  <!-- ===== EMPTY STATE ===== -->
   <div
     *ngIf="!loading && !error && filteredChores.length === 0"
-    class="p-12 text-center"
+    class="p-12 text-center bg-blue-200/20 backdrop-blur-sm border-2 border-blue-950/20 rounded-xl mx-4 my-6"
   >
     <!-- House icon -->
     <div class="mb-6 flex justify-center">
-      <svg class="w-16 h-16 text-blue-950/40" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-      </svg>
+      <div class="bg-white/30 backdrop-blur-sm border border-blue-950/30 rounded-full p-4 shadow-lg">
+        <svg class="w-12 h-12 text-blue-950" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+        </svg>
+      </div>
     </div>
     
-    <h3 class="text-xl font-semibold text-blue-950 mb-2">No chores yet!</h3>
-    <p class="text-blue-950/70 mb-6">Get started by adding your first chore to keep your space organized.</p>
+    <h3 class="text-2xl font-bold font-loopet text-blue-950 mb-3">No chores yet!</h3>
+    <p class="text-blue-950/80 mb-6 text-lg font-medium">Get started by adding your first chore to keep your space organized.</p>
     
-    <div *ngIf="activeTab !== 'all'" class="mb-6">
-      <p class="text-blue-950/50 text-sm">
+    <!-- Filter-specific message -->
+    <div *ngIf="activeTab !== 'all'" class="mb-6 bg-white/20 backdrop-blur-sm border border-blue-950/20 rounded-lg p-3">
+      <p class="text-blue-950/70 text-sm font-medium">
         Try selecting a different filter or create a new chore.
       </p>
     </div>
     
-    <!-- Prominent Add Chore button for empty state -->
+    <!-- Call-to-action button -->
     <button
       (click)="toggleNewChoreForm()"
-      class="bg-[#578FCA] hover:bg-[#578FCA]/80 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-200 shadow-lg transform hover:scale-105"
+      class="bg-[#578FCA] hover:bg-[#578FCA]/80 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105 border-2 border-blue-950/20 backdrop-blur-sm"
     >
       + Add Your First Chore
     </button>
   </div>
 
-  <!-- Chores list -->
-  <div
-    *ngIf="!loading && !error && filteredChores.length > 0"
-    class="p-3"
-  >
+  <!-- ===== CHORES LIST ===== -->
+  <div *ngIf="!loading && !error && filteredChores.length > 0" class="p-3">
     <div
       *ngFor="let chore of filteredChores"
-      class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 mb-3 bg-blue-200/40"
-
+      class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 mt-3 bg-blue-200/40"
     >
       <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <!-- Chore title and badges -->
+        
+        <!-- Left side: Chore information -->
+        <div class="flex-1 pr-4">
+          <!-- Title and status badges -->
           <div class="flex flex-wrap items-center gap-2">
             <h3
               class="font-extrabold text-black"
@@ -311,6 +318,8 @@
             >
               {{ chore.title }}
             </h3>
+            
+            <!-- Status badges -->
             <span
               *ngIf="isYourTurn(chore) && chore.status === 'pending'"
               class="bg-[#578FCA] text-white text-xs px-2 py-1 rounded-full shadow-sm"
@@ -319,7 +328,7 @@
             </span>
             <span
               *ngIf="chore.status === 'overdue'"
-              class="bg-blue-950/20 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/40 backdrop-blur-sm"
+              class="bg-white text-blue-950 font-bold text-xs px-2 py-1 rounded-full border border-red-500"
             >
               Overdue
             </span>
@@ -330,19 +339,17 @@
               {{ chore.type }}
             </span>
             <span
-              class="bg-white/40 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/30 backdrop-blur-sm"
+              class="bg-white text-blue-950 font-bold text-xs w-6 h-6 rounded-full border-2 border-blue-950 flex items-center justify-center"
             >
-              {{ chore.points }} points
+              {{ chore.points }}
             </span>
           </div>
 
-          <!-- Chore description -->
+          <!-- Description -->
           <p class="text-sm my-2">{{ chore.description }}</p>
 
-          <!-- Chore metadata -->
-          <div
-            class="flex flex-wrap items-center text-sm font-semibold gap-x-4 gap-y-2 mb-3"
-          >
+          <!-- Metadata (assignment and due date) -->
+          <div class="flex flex-wrap items-center text-sm font-semibold gap-x-4 gap-y-2">
             <span>
               <strong class="font-semibold">Assigned to:</strong>
               {{ getUserDisplayName(chore.assigned_to) }}
@@ -352,96 +359,47 @@
               {{ chore.due_date | date : "mediumDate" }}
             </span>
           </div>
+        </div>
 
-          <!-- Action buttons for current user's pending chores -->
-          <div
-            *ngIf="isYourTurn(chore) && chore.status === 'pending'"
-            class="flex flex-wrap gap-2 mt-3"
-          >
+        <!-- Right side: Action buttons -->
+        <div class="flex items-center gap-2 ml-4">
+          
+          <!-- Action buttons for user's pending and overdue chores -->
+          <div *ngIf="isYourTurn(chore) && (chore.status === 'pending' || chore.status === 'overdue')" class="flex gap-1">
+            <!-- Complete button -->
             <button
               (click)="completeChore(chore.id)"
-              class="btn btn-sm bg-[#578FCA] hover:bg-[#578FCA]/80 text-white border-[#578FCA]"
+              class="w-10 h-10 bg-white hover:bg-white/80 border-2 border-blue-950 rounded-full flex items-center justify-center transition-all duration-200 transform hover:-translate-y-1 hover:shadow-lg"
+              title="Complete"
             >
-              Mark Complete
+              <svg class="w-6 h-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="black">
+                <path d="M10 2a8 8 0 1 1 0 16a8 8 0 0 1 0-16m0 1a7 7 0 1 0 0 14a7 7 0 0 0 0-14m3.358 4.646a.5.5 0 0 1 .058.638l-.058.07l-4.004 4.004a.5.5 0 0 1-.638.058l-.07-.058l-2-2a.5.5 0 0 1 .638-.765l.07.058L9 11.298l3.651-3.652a.5.5 0 0 1 .707 0"/>
+              </svg>
             </button>
+            
+            <!-- Postpone button (only for pending chores) -->
             <button
+              *ngIf="chore.status === 'pending'"
               (click)="postponeChore(chore.id)"
-              class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-yellow-500 backdrop-blur-sm"
+              class="w-10 h-10 bg-white hover:bg-white/80 border-2 border-blue-950 rounded-full flex items-center justify-center transition-all duration-200 transform hover:-translate-y-1 hover:shadow-lg"
+              title="Postpone"
             >
-              Postpone
-            </button>
-            <button
-              (click)="deleteChore(chore.id)"
-              class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-red-500 backdrop-blur-sm"
-            >
-              Delete
+              <svg class="w-6 h-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="black">
+                <path d="M5 11.5V8.055A.505.505 0 0 0 5.003 8a5 5 0 0 1 6.36-4.813a.5.5 0 1 0 .272-.962A6 6 0 0 0 4.004 7.94A.504.504 0 0 0 4 7.998V11.4l-.923 2.216A1 1 0 0 0 4 15h3.5a2.5 2.5 0 0 0 5 0H16a1 1 0 0 0 .923-1.384L16 11.4V9.998a.5.5 0 0 0-1 0V11.5a.5.5 0 0 0 .039.192L16 14H4l.962-2.308A.5.5 0 0 0 5 11.5ZM8.5 15h3a1.5 1.5 0 0 1-3 0ZM14 2h3.5a.5.5 0 0 1 .452.714l-.043.073L14.96 7h2.54a.5.5 0 0 1 .09.992L17.5 8H14a.5.5 0 0 1-.452-.714l.042-.073L16.54 3H14a.5.5 0 0 1-.09-.992L14 2ZM9.5 6H12a.5.5 0 0 1 .432.753l-.048.067L10.57 9H12a.5.5 0 0 1 .09.992L12 10H9.5a.5.5 0 0 1-.432-.753l.048-.067L10.933 7H9.501a.5.5 0 0 1-.09-.992L9.501 6Z"/>
+              </svg>
             </button>
           </div>
           
-          <!-- Delete button for all chores that are not pending and assigned to current user -->
-          <div
-            *ngIf="!(isYourTurn(chore) && chore.status === 'pending')"
-            class="flex gap-2 mt-3"
+          <!-- Delete button (always available) -->
+          <button
+            (click)="deleteChore(chore.id)"
+            class="w-10 h-10 bg-white hover:bg-white/80 border-2 border-blue-950 rounded-full flex items-center justify-center transition-all duration-200 transform hover:-translate-y-1 hover:shadow-lg"
+            title="Delete"
           >
-            <button
-              (click)="deleteChore(chore.id)"
-              class="btn btn-sm bg-blue-950/10 hover:bg-blue-950/20 text-blue-950 border-blue-950/30 backdrop-blur-sm"
-            >
-              🗑 Delete
-            </button>
-          </div>
-        </div>
-
-        <!-- Status indicator -->
-        <div class="ml-4">
-          <div
-            class="rounded-full h-8 w-8 flex items-center justify-center shadow-sm backdrop-blur-sm border"
-            [ngClass]="{
-              'bg-[#578FCA]/20 text-[#578FCA] border-[#578FCA]/30': chore.status === 'completed',
-              'bg-white/30 text-blue-950 border-blue-950/30': chore.status === 'pending',
-              'bg-blue-950/10 text-blue-950 border-blue-950/40': chore.status === 'overdue'
-            }"
-          >
-            <svg
-              *ngIf="chore.status === 'completed'"
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clip-rule="evenodd"
-              />
+            <svg class="w-6 h-6" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="black">
+              <path d="M7 3h2a1 1 0 0 0-2 0ZM6 3a2 2 0 1 1 4 0h4a.5.5 0 0 1 0 1h-.564l-1.205 8.838A2.5 2.5 0 0 1 9.754 15H6.246a2.5 2.5 0 0 1-2.477-2.162L2.564 4H2a.5.5 0 0 1 0-1h4Zm1 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0v-5ZM9.5 6a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5Zm-4.74 6.703A1.5 1.5 0 0 0 6.246 14h3.508a1.5 1.5 0 0 0 1.487-1.297L12.427 4H3.573l1.187 8.703Z"/>
             </svg>
-            <svg
-              *ngIf="chore.status === 'pending'"
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            <svg
-              *ngIf="chore.status === 'overdue'"
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
+          </button>
         </div>
       </div>
     </div>

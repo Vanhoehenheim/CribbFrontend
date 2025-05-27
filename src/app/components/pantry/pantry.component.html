@@ -1,50 +1,43 @@
-<!-- Main container for pantry management interface -->
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
-  <!-- Header section with title and statistics -->
-  <div class="p-4 md:p-6 bg-blue-400 text-white">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-      <div>
-        <h1 class="text-xl md:text-2xl font-teko font-semibold">Pantry Management</h1>
-        <!-- Statistics summary showing total items and expiring items -->
-        <div class="flex flex-wrap gap-4 mt-2 text-sm">
-          <span class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-            </svg>
-            <span class="hidden sm:inline">Total Items:</span> {{totalItems}}
-          </span>
-          <span class="flex items-center" *ngIf="hasExpiringItems()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="hidden sm:inline">Expiring Soon:</span> {{expiredItems}}
-          </span>
-        </div>
-      </div>
-      <!-- Add item button to create new pantry entries -->
-      <button
-        (click)="toggleAddItemForm()"
-        class="bg-white text-blue-500 hover:bg-blue-100 font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-sm w-full sm:w-auto"
-      >
-        <span class="flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Add Item
-        </span>
-      </button>
+<!-- Glass morphism container with themed styling -->
+<div class="bg-white rounded-xl border-2 border-blue-950 overflow-hidden">
+  <!-- Header with themed gradient -->
+  <div class="p-4 text-white flex justify-center items-center relative">
+    <h2 class="text-2xl inside-fancy font-bold font-loopet text-blue-950 mb-2">Pantry Management</h2>
+    <button
+      (click)="toggleAddItemForm()"
+      class="btn btn-primary px-4 py-2 border-2 border-blue-950 absolute right-4"
+    >
+      {{ showAddItemForm ? "Cancel" : "+ Add Item" }}
+    </button>
+  </div>
+
+  <!-- Statistics row with consistent styling -->
+  <div class="px-4 py-2 bg-white/5 border-b border-blue-950/10">
+    <div class="flex flex-wrap gap-6 text-sm font-medium text-blue-950/90">
+      <span class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+        </svg>
+        <span>Total Items: <strong>{{totalItems}}</strong></span>
+      </span>
+      <span class="flex items-center gap-2" *ngIf="hasExpiringItems()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Expiring Soon: <strong class="text-amber-700">{{expiredItems}}</strong></span>
+      </span>
     </div>
   </div>
 
-  <!-- Category filter navigation to filter pantry items by category -->
-  <div class="bg-gray-100 px-4 md:px-6 py-2 border-b border-gray-200">
-    <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1">
+  <!-- Tabs with glass morphism -->
+  <div class="bg-white/10 px-4 py-3">
+    <div class="flex space-x-4">
       <button
         (click)="onCategoryChange('')"
-        class="px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 whitespace-nowrap"
+        class="btn btn-sm"
         [ngClass]="{
-          'bg-blue-500 text-white': !selectedCategory,
-          'text-gray-700 hover:bg-gray-200': selectedCategory
+          'btn-solid': !selectedCategory,
+          'btn-outline': selectedCategory
         }"
       >
         All Items
@@ -52,10 +45,10 @@
       <button
         *ngFor="let category of allCategories"
         (click)="onCategoryChange(category)"
-        class="px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 whitespace-nowrap"
+        class="btn btn-sm"
         [ngClass]="{
-          'bg-blue-500 text-white': selectedCategory === category,
-          'text-gray-700 hover:bg-gray-200': selectedCategory !== category
+          'btn-solid': selectedCategory === category,
+          'btn-outline': selectedCategory !== category
         }"
       >
         {{category}}
@@ -63,168 +56,171 @@
     </div>
   </div>
 
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex justify-center items-center p-8">
+    <div
+      class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#578FCA]"
+    ></div>
+  </div>
+
+  <!-- Error message -->
+  <div
+    *ngIf="error"
+    class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-4 py-3 rounded-lg mx-4 my-4"
+    role="alert"
+  >
+    <span class="block sm:inline font-medium">⚠️ {{ error }}</span>
+  </div>
+
+  <!-- Enhanced Empty state with glass morphism styling -->
+  <div
+    *ngIf="!loading && !error && filteredItems.length === 0"
+    class="p-12 text-center bg-blue-200/20 backdrop-blur-sm border-2 border-blue-950/20 rounded-xl mx-4 my-6"
+  >
+    <!-- Pantry icon with glass morphism background -->
+    <div class="mb-6 flex justify-center">
+      <div class="bg-white/30 backdrop-blur-sm border border-blue-950/30 rounded-full p-4 shadow-lg">
+        <svg class="w-12 h-12 text-blue-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+    </div>
+    
+    <h3 class="text-2xl font-bold font-loopet text-blue-950 mb-3">No items found in your pantry!</h3>
+    <p class="text-blue-950/80 mb-6 text-lg font-medium">Get started by adding your first pantry item to track your food inventory.</p>
+    
+    <div *ngIf="selectedCategory" class="mb-6 bg-white/20 backdrop-blur-sm border border-blue-950/20 rounded-lg p-3">
+      <p class="text-blue-950/70 text-sm font-medium">
+        Try selecting a different category or create a new item.
+      </p>
+    </div>
+    
+    <!-- Prominent Add Item button for empty state with glass morphism -->
+    <button
+      (click)="toggleAddItemForm()"
+      class="bg-[#578FCA] hover:bg-[#578FCA]/80 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105 border-2 border-blue-950/20 backdrop-blur-sm"
+    >
+      + Add Your First Item
+    </button>
+  </div>
+
   <!-- Grid display of all pantry items with responsive layout -->
-  <div *ngIf="!loading && !error && filteredItems.length > 0" class="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-    <div *ngFor="let item of filteredItems"
-         class="bg-white rounded-lg shadow hover:shadow-md p-4 transition-shadow border border-gray-200"
-         [ngClass]="{'opacity-75': item.quantity <= 0}">
-      <div class="flex flex-col h-full">
-        <!-- Item header with name and quantity indicator -->
-        <div class="flex justify-between items-start mb-2 bg-">
-          <h3 class="text-lg font-bold text-gray-800 break-words pr-2">{{item.name}}</h3>
-          <span class="px-3 py-1 text-sm rounded-md flex-shrink-0 font-medium"
-                [ngClass]="{
-                  'bg-green-50 text-green-700 border border-green-200': !item.is_expiring_soon && !item.is_expired && item.quantity > 0,
-                  'bg-amber-50 text-amber-700 border border-amber-200': item.is_expiring_soon && !item.is_expired && item.quantity > 0,
-                  'bg-red-50 text-red-700 border border-red-200': item.is_expired || item.quantity <= 0
-                }">
-            {{item.quantity}} {{item.unit}}
-          </span>
-        </div>
-        
-        <!-- Item status indicators in a cleaner layout -->
-        <div class="flex flex-wrap gap-2 mb-3">
-          <!-- Category badge -->
-          <div class="flex items-center">
-            <span class="bg-gray-100 border border-gray-200 text-gray-600 text-xs px-2 py-0.5 rounded-md">
-              {{item.category}}
+  <div *ngIf="!loading && !error && filteredItems.length > 0" class="p-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <div *ngFor="let item of filteredItems"
+           class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 mb-3 bg-blue-200/40"
+           [ngClass]="{'opacity-75': item.quantity <= 0}">
+        <div class="flex flex-col h-full">
+          <!-- Item header with name and quantity indicator -->
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-extrabold text-black break-words pr-2"
+                [ngClass]="{ 'line-through': item.quantity <= 0 }">{{item.name}}</h3>
+            <span class="bg-white/40 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/30 backdrop-blur-sm flex-shrink-0 font-medium">
+              {{item.quantity}} {{item.unit}}
             </span>
           </div>
           
-          <!-- Expiration status -->
-          <div *ngIf="item.is_expiring_soon && !item.is_expired && item.quantity > 0" 
-               class="flex items-center text-amber-600 text-xs">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            Expiring Soon
+          <!-- Item status indicators in a cleaner layout -->
+          <div class="flex flex-wrap gap-2 mb-3">
+            <!-- Category badge -->
+            <span class="bg-white/30 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/30 backdrop-blur-sm">
+              {{item.category}}
+            </span>
+            
+            <!-- Expiration status -->
+            <span *ngIf="item.is_expiring_soon && !item.is_expired && item.quantity > 0" 
+                 class="bg-[#578FCA] text-white text-xs px-2 py-1 rounded-full shadow-sm">
+              Expiring Soon
+            </span>
+            
+            <span *ngIf="item.is_expired && item.quantity > 0" 
+                 class="bg-blue-950/20 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/40 backdrop-blur-sm">
+              Expired
+            </span>
           </div>
-          
-          <div *ngIf="item.is_expired && item.quantity > 0" 
-               class="flex items-center text-red-600 text-xs">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            Expired
+
+          <!-- Item details showing expiration date and who added the item -->
+          <div class="text-sm font-semibold mb-3 flex-grow space-y-1">
+            <p *ngIf="item.expiration_date && item.quantity > 0" class="flex items-center">
+              <strong class="font-semibold">Expires:</strong>
+              {{item.expiration_date | date : "mediumDate"}}
+            </p>
+            <p class="flex items-center">
+              <strong class="font-semibold">Added by:</strong>
+              {{item.added_by_name}}
+            </p>
           </div>
-        </div>
 
-        <!-- Item details showing expiration date and who added the item -->
-        <div class="text-xs text-gray-600 space-y-1 mb-3 flex-grow">
-          <p *ngIf="item.expiration_date && item.quantity > 0" class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>Expires: {{item.expiration_date | date : "mediumDate"}}</span>
-          </p>
-          <p class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span>Added by: {{item.added_by_name}}</span>
-          </p>
-        </div>
-
-        <!-- Action controls for using, updating and deleting items -->
-        <div class="mt-auto space-y-2">
-          <!-- Quantity selector for choosing how much to use -->
-          <div *ngIf="item.quantity > 0" class="flex items-center justify-between">
-            <span class="text-xs text-gray-600">Quantity:</span>
-            <div class="flex items-center border rounded overflow-hidden">
+          <!-- Action controls for using, updating and deleting items -->
+          <div class="mt-auto space-y-2">
+            <!-- Quantity selector for choosing how much to use -->
+            <div *ngIf="item.quantity > 0" class="flex items-center justify-between">
+              <span class="text-xs text-blue-950">Quantity:</span>
+              <div class="flex items-center border border-blue-950/30 rounded overflow-hidden bg-white/50 backdrop-blur-sm">
+                <button
+                  (click)="decrementQuantity(item)"
+                  class="w-7 h-7 flex items-center justify-center bg-white/30 hover:bg-white/50 text-blue-950"
+                  [disabled]="(item.selectedQuantity || 1) <= 1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                  </svg>
+                </button>
+                <span class="w-7 h-7 flex items-center justify-center text-sm text-blue-950">
+                  {{item.selectedQuantity || 1}}
+                </span>
+                <button
+                  (click)="incrementQuantity(item)"
+                  class="w-7 h-7 flex items-center justify-center bg-white/30 hover:bg-white/50 text-blue-950"
+                  [disabled]="(item.selectedQuantity || 1) >= item.quantity">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Primary 'Use Item' button to consume inventory -->
+            <button
+              *ngIf="item.quantity > 0"
+              (click)="onUseItem(item, item.selectedQuantity || 1)"
+              class="btn btn-sm bg-[#578FCA] hover:bg-[#578FCA]/80 text-white border-[#578FCA] w-full"
+              [disabled]="item.quantity <= 0">
+              Use {{item.selectedQuantity || 1}} {{item.unit}}
+            </button>
+            
+            <!-- Secondary action buttons for updating and deleting -->
+            <div class="flex gap-2">
               <button
-                (click)="decrementQuantity(item)"
-                class="w-7 h-7 flex items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-700"
-                [disabled]="(item.selectedQuantity || 1) <= 1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                </svg>
+                (click)="onUpdateQuantity(item)"
+                class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950/30 backdrop-blur-sm flex-1">
+                Update
               </button>
-              <span class="w-7 h-7 flex items-center justify-center text-sm">
-                {{item.selectedQuantity || 1}}
-              </span>
               <button
-                (click)="incrementQuantity(item)"
-                class="w-7 h-7 flex items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-700"
-                [disabled]="(item.selectedQuantity || 1) >= item.quantity">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
+                (click)="onDeleteItem(item.id)"
+                class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950/30 backdrop-blur-sm flex-1">
+                🗑 Delete
               </button>
             </div>
-          </div>
-          
-          <!-- Primary 'Use Item' button to consume inventory -->
-          <button
-            *ngIf="item.quantity > 0"
-            (click)="onUseItem(item, item.selectedQuantity || 1)"
-            class="w-full border border-blue-500 text-blue-500 hover:bg-blue-50 font-medium py-1 px-2 text-xs rounded-md transition-colors flex items-center justify-center"
-            [disabled]="item.quantity <= 0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Use {{item.selectedQuantity || 1}} {{item.unit}}
-          </button>
-          
-          <!-- Secondary action buttons for updating and deleting -->
-          <div class="flex gap-2">
-            <button
-              (click)="onUpdateQuantity(item)"
-              class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-50 py-1 px-2 text-xs rounded-md transition-colors flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              <span class="hidden sm:inline">Update</span>
-            </button>
-            <button
-              (click)="onDeleteItem(item.id)"
-              class="flex-1 border border-red-500 text-red-500 hover:bg-red-50 py-1 px-2 text-xs rounded-md transition-colors flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              <span class="hidden sm:inline">Delete</span>
+
+            <!-- Add to Cart Button -->
+            <button 
+              (click)="openAddToCartModal(item)" 
+              class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950/30 backdrop-blur-sm w-full">
+              Add to Cart 
             </button>
           </div>
         </div>
-
-        <!-- Add to Cart Button -->
-        <button 
-          (click)="openAddToCartModal(item)" 
-          class="mt-2 w-full border border-blue-500 text-blue-500 hover:bg-blue-50 py-1 px-2 text-xs rounded-md transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          Add to Cart 
-        </button>
       </div>
     </div>
   </div>
-  
-  <!-- Empty state display when no items are found -->
-  <div *ngIf="!loading && !error && filteredItems.length === 0" class="p-8 text-center">
-    <div class="mx-auto w-24 h-24 mb-4 text-gray-300">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    </div>
-    <p class="text-gray-500 text-lg">No items found in your pantry.</p>
-    <button 
-      (click)="toggleAddItemForm()" 
-      class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-      Add Your First Item
-    </button>
-  </div>
 </div>
 
-<!-- Add Item Form Modal -->
+<!-- Add Item Form Modal with glass morphism -->
 <div *ngIf="showAddItemForm" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" (click)="closeAddItemForm($event)">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+  <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl border-2 border-blue-950 w-full max-w-md p-6">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold text-gray-800">Add New Pantry Item</h2>
-      <button (click)="toggleAddItemForm()" class="text-gray-500 hover:text-gray-700">
+      <h2 class="text-xl font-semibold text-blue-950 font-loopet">Add New Pantry Item</h2>
+      <button (click)="toggleAddItemForm()" class="text-blue-950 hover:text-blue-950/70">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -236,12 +232,12 @@
   </div>
 </div>
 
-<!-- Update Quantity Modal -->
+<!-- Update Quantity Modal with glass morphism -->
 <div *ngIf="itemToUpdate" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+  <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl border-2 border-blue-950 w-full max-w-md p-6">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold text-gray-800">Update Item Details</h2>
-      <button (click)="cancelUpdate()" class="text-gray-500 hover:text-gray-700">
+      <h2 class="text-xl font-semibold text-blue-950 font-loopet">Update Item Details</h2>
+      <button (click)="cancelUpdate()" class="text-blue-950 hover:text-blue-950/70">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -251,48 +247,46 @@
     <div class="space-y-4">
       <!-- Quantity update section -->
       <div>
-        <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+        <label for="quantity" class="block text-sm font-medium text-blue-950 mb-1">Quantity</label>
         <div class="flex items-center">
           <input 
             id="quantity"
             type="number" 
             [(ngModel)]="newQuantity"
             min="0"
-            class="w-12 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
           />
-          <span class="ml-2 text-gray-600">{{itemToUpdate.unit}}</span>
+          <span class="ml-2 text-blue-950">{{itemToUpdate.unit}}</span>
         </div>
       </div>
       
       <!-- Expiration date section -->
       <div>
-        <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">
-          <div class="flex items-center">
-            <span>Expiration Date</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
+        <label for="expiryDate" class="block text-sm font-medium text-blue-950 mb-1">
+          Expiration Date
         </label>
         <input 
           id="expiryDate"
           type="date" 
           [(ngModel)]="newExpiryDate"
-          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
         />
       </div>
     </div>
     
-    <div class="flex justify-end space-x-3 mt-6">
-      <button 
-        (click)="cancelUpdate()" 
-        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+    <!-- Action Buttons -->
+    <div class="flex justify-end space-x-3 pt-4">
+      <button
+        type="button"
+        (click)="cancelUpdate()"
+        class="px-4 py-2 text-sm font-medium text-blue-950 bg-white/30 hover:bg-white/50 rounded-lg transition-all duration-150 border border-blue-950/30 backdrop-blur-sm"
       >
         Cancel
       </button>
-      <button 
-        (click)="saveItemUpdate()" 
-        class="px-4 py-2 bg-blue-500 rounded-md text-white hover:bg-blue-600 transition-colors"
+      <button
+        type="button"
+        (click)="saveItemUpdate()"
+        class="px-4 py-2 text-sm font-medium text-white bg-[#578FCA] hover:bg-[#578FCA]/80 rounded-lg transition-all duration-150 shadow-lg"
       >
         Save Changes
       </button>
@@ -300,42 +294,23 @@
   </div>
 </div>
 
-<!-- CSS Helper for Mobile -->
-<style>
-  /* Hide scrollbar but allow scrolling for category filters */
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Better touch targets on mobile */
-  @media (max-width: 640px) {
-    button, .button {
-      min-height: 44px;
-    }
-  }
-</style>
-
-<!-- Add to Cart Modal -->
-<div *ngIf="showAddToCartModal && itemForCartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" (click)="closeAddToCartModal()"> <!-- Close on backdrop click -->
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()"> <!-- Prevent closing on modal content click -->
+<!-- Add to Cart Modal with glass morphism -->
+<div *ngIf="showAddToCartModal && itemForCartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" (click)="closeAddToCartModal()">
+  <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl border-2 border-blue-950 w-full max-w-sm p-6" (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold text-gray-800">Add to Cart</h2>
-      <button (click)="closeAddToCartModal()" class="text-gray-500 hover:text-gray-700">
+      <h2 class="text-xl font-semibold text-blue-950 font-loopet">Add to Cart</h2>
+      <button (click)="closeAddToCartModal()" class="text-blue-950 hover:text-blue-950/70">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
 
-    <p class="mb-4">How many <strong class="font-medium">{{ itemForCartModal.name }}</strong> would you like to add?</p>
+    <p class="mb-4 text-blue-950">How many <strong class="font-medium">{{ itemForCartModal.name }}</strong> would you like to add?</p>
 
     <form (ngSubmit)="confirmAddToCart()" class="space-y-4">
       <div>
-        <label for="addToCartQuantity" class="block text-sm font-medium text-gray-700 mb-1">
+        <label for="addToCartQuantity" class="block text-sm font-medium text-blue-950 mb-1">
           Quantity*
         </label>
         <input
@@ -345,12 +320,12 @@
           name="addToCartQuantity"
           required
           min="1"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950"
         />
       </div>
 
       <!-- Error Display -->
-      <div *ngIf="addToCartModalError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mt-3" role="alert">
+      <div *ngIf="addToCartModalError" class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-4 py-3 rounded-lg" role="alert">
         {{ addToCartModalError }}
       </div>
 
@@ -360,14 +335,14 @@
           type="button"
           (click)="closeAddToCartModal()"
           [disabled]="isAddingToCartInModal"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 text-sm font-medium text-blue-950 bg-white/30 hover:bg-white/50 rounded-lg transition-all duration-150 border border-blue-950/30 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
         <button
           type="submit"
           [disabled]="isAddingToCartInModal"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 text-sm font-medium text-white bg-[#578FCA] hover:bg-[#578FCA]/80 rounded-lg transition-all duration-150 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ isAddingToCartInModal ? 'Adding...' : 'Add to Cart' }}
         </button>
