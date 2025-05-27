@@ -1,5 +1,5 @@
 <!-- Main container with glass morphism styling -->
-<div class="bg-white rounded-xl border-2 border-blue-950 overflow-hidden">
+<div class="bg-white rounded-xl border-2 border-blue-950 overflow-hidden p-5">
   
   <!-- ===== HEADER SECTION ===== -->
   <div class="p-4 text-white flex justify-center items-center relative">
@@ -304,7 +304,7 @@
   <div *ngIf="!loading && !error && filteredChores.length > 0" class="p-3">
     <div
       *ngFor="let chore of filteredChores"
-      class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 mt-3 bg-blue-200/40"
+      class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 mt-5 bg-blue-200/20"
     >
       <div class="flex items-start justify-between">
         
