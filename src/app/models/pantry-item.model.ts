@@ -32,6 +32,18 @@ export interface AddPantryItemRequest {
 }
 
 /**
+ * Request payload for updating an existing pantry item
+ */
+export interface UpdatePantryItemRequest {
+  name: string;                 // Name of the item
+  quantity: number;             // Updated quantity
+  unit: string;                 // Unit of measurement
+  category?: string;            // Optional category
+  expiration_date?: string;     // Optional expiration date
+  group_name: string;           // Name of the household group
+}
+
+/**
  * Request payload for using/consuming a pantry item
  */
 export interface UsePantryItemRequest {

@@ -210,7 +210,7 @@ export class ShoppingCartComponent implements OnInit {
 
   /**
    * Handles the confirmation from the Add to Pantry modal.
-   * Adds item to pantry with details, then removes from cart.
+   * Checks if item exists in pantry, updates quantity if it does, or adds new item if it doesn't.
    */
   confirmAddToPantry(): void {
     if (!this.itemForPantryModal || !this.pantryCategory) {
@@ -225,6 +225,8 @@ export class ShoppingCartComponent implements OnInit {
       setTimeout(() => this.addToPantryModalError = null, 3000);
       return;
     }
+
+    const groupName = currentUser.groupName; // Extract to ensure type safety
 
     this.isAddingToPantryInModal = true;
     this.addToPantryModalError = null;
@@ -244,18 +246,46 @@ export class ShoppingCartComponent implements OnInit {
       }
     }
 
-    const pantryItemRequest: AddPantryItemRequest = {
-      name: this.itemForPantryModal.item_name,
-      quantity: this.itemForPantryModal.quantity,
-      unit: 'units', // Still using default unit
-      category: this.pantryCategory,
-      group_name: currentUser.groupName,
-      expiration_date: formattedExpiryDate
-    };
+    // First, check if an item with the same name already exists in the pantry
+    this.pantryService.listItems(groupName).pipe(
+      switchMap((existingItems) => {
+        // Look for an existing item with the same name (case-insensitive)
+        const existingItem = existingItems.find(item => 
+          item.name.toLowerCase() === this.itemForPantryModal!.item_name.toLowerCase()
+        );
 
-    this.pantryService.addItem(pantryItemRequest).pipe(
+        if (existingItem) {
+          // Item exists - update the quantity
+          console.log(`Item ${this.itemForPantryModal?.item_name} already exists in pantry. Updating quantity...`);
+          
+          const updateRequest = {
+            name: existingItem.name,
+            quantity: existingItem.quantity + this.itemForPantryModal!.quantity, // Add to existing quantity
+            unit: existingItem.unit,
+            category: this.pantryCategory, // Use the new category from the modal
+            group_name: groupName,
+            expiration_date: formattedExpiryDate || existingItem.expiration_date // Use new date if provided, otherwise keep existing
+          };
+
+          return this.pantryService.updateItem(existingItem.id, updateRequest);
+        } else {
+          // Item doesn't exist - create a new one
+          console.log(`Item ${this.itemForPantryModal?.item_name} doesn't exist in pantry. Creating new item...`);
+          
+          const pantryItemRequest: AddPantryItemRequest = {
+            name: this.itemForPantryModal!.item_name,
+            quantity: this.itemForPantryModal!.quantity,
+            unit: 'units', // Still using default unit
+            category: this.pantryCategory,
+            group_name: groupName,
+            expiration_date: formattedExpiryDate
+          };
+
+          return this.pantryService.addItem(pantryItemRequest);
+        }
+      }),
       switchMap(() => {
-        console.log(`Successfully added ${this.itemForPantryModal?.item_name} to pantry. Deleting from cart...`);
+        console.log(`Successfully processed ${this.itemForPantryModal?.item_name} in pantry. Deleting from cart...`);
         return this.shoppingCartService.deleteItem(this.itemForPantryModal!.id);
       }),
       catchError((err: any) => {
@@ -267,7 +297,7 @@ export class ShoppingCartComponent implements OnInit {
       })
     ).subscribe({
       next: () => {
-        console.log(`Item ${this.itemForPantryModal?.id} successfully removed from cart after adding to pantry.`);
+        console.log(`Item ${this.itemForPantryModal?.id} successfully removed from cart after processing in pantry.`);
         this.closeAddToPantryModal(); // Close modal on final success
       },
       // Error handled by catchError

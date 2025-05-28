@@ -1,5 +1,5 @@
 <!-- Glass morphism container with themed styling -->
-<div class="bg-white rounded-xl border-2 border-blue-950 overflow-hidden">
+<div class="bg-white rounded-xl border-2 border-blue-950 overflow-hidden p-5">
   <!-- Header with themed gradient -->
   <div class="p-4 text-white flex justify-center items-center relative">
     <h2 class="text-2xl inside-fancy font-bold font-loopet text-blue-950 mb-2">Pantry Management</h2>
@@ -12,7 +12,7 @@
   </div>
 
   <!-- Statistics row with consistent styling -->
-  <div class="px-4 py-2 bg-white/5 border-b border-blue-950/10">
+  <!-- <div class="px-4 py-2 bg-white/5 border-b border-blue-950/10">
     <div class="flex flex-wrap gap-6 text-sm font-medium text-blue-950/90">
       <span class="flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,7 +27,7 @@
         <span>Expiring Soon: <strong class="text-amber-700">{{expiredItems}}</strong></span>
       </span>
     </div>
-  </div>
+  </div> -->
 
   <!-- Tabs with glass morphism -->
   <div class="bg-white/10 px-4 py-3">
@@ -104,111 +104,193 @@
     </button>
   </div>
 
-  <!-- Grid display of all pantry items with responsive layout -->
+    <!-- Grid display of all pantry items with responsive layout -->
   <div *ngIf="!loading && !error && filteredItems.length > 0" class="p-3">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-      <div *ngFor="let item of filteredItems"
-           class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 mb-3 bg-blue-200/40"
-           [ngClass]="{'opacity-75': item.quantity <= 0}">
-        <div class="flex flex-col h-full">
-          <!-- Item header with name and quantity indicator -->
+    <!-- Available Items Section -->
+    <div *ngIf="hasAvailableItems()">
+      <h3 class="text-lg font-bold text-blue-950 mb-4 font-loopet">Available Items</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div *ngFor="let item of getAvailableItems()"
+             class="p-4 transition-all duration-200 border-2 rounded-xl border-blue-950 bg-blue-200/20 flex flex-col">
+          
+          <!-- Item header with name and action buttons -->
           <div class="flex justify-between items-start mb-2">
-            <h3 class="font-extrabold text-black break-words pr-2"
-                [ngClass]="{ 'line-through': item.quantity <= 0 }">{{item.name}}</h3>
-            <span class="bg-white/40 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/30 backdrop-blur-sm flex-shrink-0 font-medium">
-              {{item.quantity}} {{item.unit}}
-            </span>
+            <h3 class="font-extrabold text-black break-words pr-2 text-md">{{item.name}}</h3>
+            
+            <!-- Action buttons in top right -->
+            <div class="flex gap-1">
+              <button
+                (click)="onUpdateQuantity(item)"
+                class="btn btn-sm btn-primary"
+                title="Update item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" class="w-4 h-4">
+                  <path fill="currentColor" d="M12.92 2.873a2.975 2.975 0 0 1 4.207 4.207l-.669.669l-4.207-4.207zM11.544 4.25l-7.999 7.999a2.44 2.44 0 0 0-.655 1.194l-.878 3.95a.5.5 0 0 0 .597.597l3.926-.873a2.5 2.5 0 0 0 1.234-.678l7.982-7.982z"/>
+                </svg>
+              </button>
+              
+              <button
+                (click)="openAddToCartModal(item)"
+                class="btn btn-sm btn-primary"
+                title="Add to cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" class="w-4 h-4">
+                  <path fill="currentColor" d="M2.997 3.496a.5.5 0 0 1 .5-.5h.438c.727 0 1.145.473 1.387.945c.165.323.284.717.383 1.059H16a1 1 0 0 1 .962 1.272l-1.496 5.275A2 2 0 0 1 13.542 13H8.463a2 2 0 0 1-1.93-1.473l-.642-2.355l-.01-.032l-1.03-3.498l-.1-.337c-.1-.346-.188-.652-.32-.909c-.159-.31-.305-.4-.496-.4h-.438a.5.5 0 0 1-.5-.5M8.5 17a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m5 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3"/>
+                </svg>
+              </button>
+              
+              <button
+                (click)="onDeleteItem(item.id)"
+                class="btn btn-sm btn-primary"
+                title="Delete item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="w-4 h-4 text-red-600">
+                  <path fill="currentColor" d="M7 3h2a1 1 0 0 0-2 0ZM6 3a2 2 0 1 1 4 0h4a.5.5 0 0 1 0 1h-.564l-1.205 8.838A2.5 2.5 0 0 1 9.754 15H6.246a2.5 2.5 0 0 1-2.477-2.162L2.564 4H2a.5.5 0 0 1 0-1h4Zm1 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0v-5ZM9.5 6a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5Zm-4.74 6.703A1.5 1.5 0 0 0 6.246 14h3.508a1.5 1.5 0 0 0 1.487-1.297L12.427 4H3.573l1.187 8.703Z"/>
+                </svg>
+              </button>
+            </div>
           </div>
           
-          <!-- Item status indicators in a cleaner layout -->
-          <div class="flex flex-wrap gap-2 mb-3">
+          <!-- Item status indicators -->
+          <div class="flex flex-wrap gap-1 mb-3">
             <!-- Category badge -->
             <span class="bg-white/30 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/30 backdrop-blur-sm">
               {{item.category}}
             </span>
             
             <!-- Expiration status -->
-            <span *ngIf="item.is_expiring_soon && !item.is_expired && item.quantity > 0" 
-                 class="bg-[#578FCA] text-white text-xs px-2 py-1 rounded-full shadow-sm">
+            <span *ngIf="item.is_expiring_soon && !item.is_expired" 
+                 class="bg-white text-blue-950 font-bold text-xs px-2 py-1 rounded-full border border-yellow-500">
               Expiring Soon
             </span>
             
-            <span *ngIf="item.is_expired && item.quantity > 0" 
-                 class="bg-blue-950/20 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/40 backdrop-blur-sm">
+            <span *ngIf="item.is_expired" 
+                 class="bg-white text-blue-950 font-bold text-xs px-2 py-1 rounded-full border border-red-500">
               Expired
             </span>
           </div>
 
-          <!-- Item details showing expiration date and who added the item -->
-          <div class="text-sm font-semibold mb-3 flex-grow space-y-1">
-            <p *ngIf="item.expiration_date && item.quantity > 0" class="flex items-center">
-              <strong class="font-semibold">Expires:</strong>
-              {{item.expiration_date | date : "mediumDate"}}
+          <!-- Item details -->
+          <div class="text-xs font-semibold mb-3 flex-grow space-y-1">
+            <p *ngIf="item.expiration_date">
+              <strong class="font-bold">Expires:</strong>
+              {{item.expiration_date | date : "MMM d"}}
             </p>
-            <p class="flex items-center">
-              <strong class="font-semibold">Added by:</strong>
+            <p>
+              <strong class="font-bold">Added by:</strong>
               {{item.added_by_name}}
             </p>
           </div>
 
-          <!-- Action controls for using, updating and deleting items -->
+          <!-- Action controls -->
           <div class="mt-auto space-y-2">
-            <!-- Quantity selector for choosing how much to use -->
-            <div *ngIf="item.quantity > 0" class="flex items-center justify-between">
-              <span class="text-xs text-blue-950">Quantity:</span>
-              <div class="flex items-center border border-blue-950/30 rounded overflow-hidden bg-white/50 backdrop-blur-sm">
+            <!-- Quantity selector, use button, and quantity badge in same row -->
+            <div class="flex items-center gap-2">
+              <!-- Quantity selector -->
+              <div class="flex items-center bg-white border-2 border-blue-950 rounded-full shadow-sm">
                 <button
                   (click)="decrementQuantity(item)"
-                  class="w-7 h-7 flex items-center justify-center bg-white/30 hover:bg-white/50 text-blue-950"
+                  class="w-6 h-6 flex items-center justify-center hover:bg-blue-50 text-blue-950 rounded-l-full transition-colors"
                   [disabled]="(item.selectedQuantity || 1) <= 1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                   </svg>
                 </button>
-                <span class="w-7 h-7 flex items-center justify-center text-sm text-blue-950">
+                <span class="w-6 h-6 flex items-center justify-center text-xs text-blue-950 font-bold bg-blue-50 border-x-2 border-blue-950">
                   {{item.selectedQuantity || 1}}
                 </span>
                 <button
                   (click)="incrementQuantity(item)"
-                  class="w-7 h-7 flex items-center justify-center bg-white/30 hover:bg-white/50 text-blue-950"
+                  class="w-6 h-6 flex items-center justify-center hover:bg-blue-50 text-blue-950 rounded-r-full transition-colors"
                   [disabled]="(item.selectedQuantity || 1) >= item.quantity">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </button>
               </div>
+              
+              <!-- Primary use button -->
+              <button
+                (click)="onUseItem(item, item.selectedQuantity || 1)"
+                class="btn btn-sm flex-1 bg-blue-950 text-white">
+                Use {{item.selectedQuantity || 1}} {{item.unit}}
+              </button>
+              
+              <!-- Quantity badge -->
+              <span class="bg-white text-blue-950 font-bold text-xs px-2 py-1 rounded-full border-2 border-blue-950 flex-shrink-0">
+                {{item.quantity}} {{item.unit}}
+              </span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Out of Stock Items Section -->
+    <div *ngIf="hasOutOfStockItemsFiltered()" class="mt-8">
+      <h3 class="text-lg font-bold text-blue-950 mb-4 font-loopet">Out of Stock</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div *ngFor="let item of getOutOfStockItems()"
+             class="p-4 transition-all duration-200 border-2 rounded-xl border-red-800 bg-red-50/30 flex flex-col opacity-75">
+          
+          <!-- Item header with name and action buttons -->
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-extrabold text-black break-words pr-2 text-md line-through">{{item.name}}</h3>
             
-            <!-- Primary 'Use Item' button to consume inventory -->
-            <button
-              *ngIf="item.quantity > 0"
-              (click)="onUseItem(item, item.selectedQuantity || 1)"
-              class="btn btn-sm bg-[#578FCA] hover:bg-[#578FCA]/80 text-white border-[#578FCA] w-full"
-              [disabled]="item.quantity <= 0">
-              Use {{item.selectedQuantity || 1}} {{item.unit}}
-            </button>
-            
-            <!-- Secondary action buttons for updating and deleting -->
-            <div class="flex gap-2">
+            <!-- Action buttons in top right -->
+            <div class="flex gap-1">
               <button
                 (click)="onUpdateQuantity(item)"
-                class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950/30 backdrop-blur-sm flex-1">
-                Update
+                class="btn btn-sm btn-primary border-2 border-red-950"
+                title="Update item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" class="w-4 h-4">
+                  <path fill="currentColor" d="M12.92 2.873a2.975 2.975 0 0 1 4.207 4.207l-.669.669l-4.207-4.207zM11.544 4.25l-7.999 7.999a2.44 2.44 0 0 0-.655 1.194l-.878 3.95a.5.5 0 0 0 .597.597l3.926-.873a2.5 2.5 0 0 0 1.234-.678l7.982-7.982z"/>
+                </svg>
               </button>
+              
+              <button
+                (click)="openAddToCartModal(item)"
+                class="btn btn-sm btn-primary border-2 border-red-950"
+                title="Add to cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" class="w-4 h-4">
+                  <path fill="currentColor" d="M2.997 3.496a.5.5 0 0 1 .5-.5h.438c.727 0 1.145.473 1.387.945c.165.323.284.717.383 1.059H16a1 1 0 0 1 .962 1.272l-1.496 5.275A2 2 0 0 1 13.542 13H8.463a2 2 0 0 1-1.93-1.473l-.642-2.355l-.01-.032l-1.03-3.498l-.1-.337c-.1-.346-.188-.652-.32-.909c-.159-.31-.305-.4-.496-.4h-.438a.5.5 0 0 1-.5-.5M8.5 17a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m5 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3"/>
+                </svg>
+              </button>
+              
               <button
                 (click)="onDeleteItem(item.id)"
-                class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950/30 backdrop-blur-sm flex-1">
-                🗑 Delete
+                class="btn btn-sm btn-primary border-2 border-red-950"
+                title="Delete item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="w-4 h-4 text-red-600">
+                  <path fill="currentColor" d="M7 3h2a1 1 0 0 0-2 0ZM6 3a2 2 0 1 1 4 0h4a.5.5 0 0 1 0 1h-.564l-1.205 8.838A2.5 2.5 0 0 1 9.754 15H6.246a2.5 2.5 0 0 1-2.477-2.162L2.564 4H2a.5.5 0 0 1 0-1h4Zm1 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0v-5ZM9.5 6a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5Zm-4.74 6.703A1.5 1.5 0 0 0 6.246 14h3.508a1.5 1.5 0 0 0 1.487-1.297L12.427 4H3.573l1.187 8.703Z"/>
+                </svg>
               </button>
             </div>
-
-            <!-- Add to Cart Button -->
-            <button 
-              (click)="openAddToCartModal(item)" 
-              class="btn btn-sm bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950/30 backdrop-blur-sm w-full">
-              Add to Cart 
-            </button>
           </div>
+          
+          <!-- Item status indicators -->
+          <div class="flex flex-wrap gap-1 mb-3">
+            <!-- Category badge -->
+            <span class="bg-white/30 text-blue-950 text-xs px-2 py-1 rounded-full border border-blue-950/30 backdrop-blur-sm">
+              {{item.category}}
+            </span>
+            
+            <!-- Out of stock badge -->
+            <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-sm">
+              Out of Stock
+            </span>
+          </div>
+
+          <!-- Item details -->
+          <div class="text-xs font-semibold mb-3 flex-grow space-y-1">
+            <p *ngIf="item.expiration_date">
+              <strong class="font-bold">Expires:</strong>
+              {{item.expiration_date | date : "MMM d"}}
+            </p>
+            <p>
+              <strong class="font-bold">Added by:</strong>
+              {{item.added_by_name}}
+            </p>
+          </div>
+
+
         </div>
       </div>
     </div>

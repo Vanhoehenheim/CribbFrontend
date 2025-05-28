@@ -84,6 +84,25 @@ export class PantryComponent implements OnInit {
   }
 
   /**
+   * Helper methods for filtering items by availability status
+   */
+  getAvailableItems(): PantryItem[] {
+    return this.filteredItems.filter(item => item.quantity > 0);
+  }
+
+  getOutOfStockItems(): PantryItem[] {
+    return this.filteredItems.filter(item => item.quantity <= 0);
+  }
+
+  hasAvailableItems(): boolean {
+    return this.getAvailableItems().length > 0;
+  }
+
+  hasOutOfStockItemsFiltered(): boolean {
+    return this.getOutOfStockItems().length > 0;
+  }
+
+  /**
    * Initialize component by loading user data and pantry items
    */
   ngOnInit(): void {
@@ -338,8 +357,8 @@ export class PantryComponent implements OnInit {
       formattedExpiryDate = expiryDate.toISOString();
     }
 
-    // Use the existing addItem endpoint to update the item
-    this.pantryService.addItem({
+    // Use the updateItem method for updating existing items
+    this.pantryService.updateItem(this.itemToUpdate.id, {
       name: this.itemToUpdate.name,
       quantity: this.newQuantity,
       unit: this.itemToUpdate.unit,

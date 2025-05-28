@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PantryItem, AddPantryItemRequest, UsePantryItemRequest, UsePantryItemResponse } from '../models/pantry-item.model';
+import { PantryItem, AddPantryItemRequest, UpdatePantryItemRequest, UsePantryItemRequest, UsePantryItemResponse } from '../models/pantry-item.model';
 import { ApiService } from './api.service';
 
 /**
@@ -28,6 +28,18 @@ export class PantryService {
   addItem(item: AddPantryItemRequest): Observable<PantryItem> {
     const headers = this.apiService.getAuthHeaders();
     return this.http.post<PantryItem>(`${this.apiUrl}/add`, item, { headers });
+  }
+
+  /**
+   * Update an existing pantry item
+   * @param itemId - The ID of the item to update
+   * @param updateData - The updated item data
+   * @returns Observable with the updated item
+   */
+  updateItem(itemId: string, updateData: UpdatePantryItemRequest): Observable<PantryItem> {
+    const headers = this.apiService.getAuthHeaders();
+    // Use the dedicated update endpoint with PUT method
+    return this.http.put<PantryItem>(`${this.apiUrl}/update/${itemId}`, updateData, { headers });
   }
 
   /**
