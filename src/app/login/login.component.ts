@@ -81,6 +81,10 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
+  goBack() {
+    this.router.navigate(['/']);
+  }
+
   // Show a temporary success message
   private showSuccessMessage() {
     // Create a success message element

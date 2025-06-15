@@ -102,6 +102,10 @@ export class SignupComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
+  goBack() {
+    this.router.navigate(['/']);
+  }
+
   // Close modal methods
   closeJoinModal(): void {
     if (this.joinModal) {

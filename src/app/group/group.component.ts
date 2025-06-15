@@ -11,7 +11,7 @@ import { Router } from "@angular/router";
 @Component({
   selector: 'app-group',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIcon],
+  imports: [CommonModule, FormsModule],
   providers: [provideIcons({ iconoirTrophy })],
   templateUrl: './group.component.html',
   styleUrls: ['./group.component.scss']
