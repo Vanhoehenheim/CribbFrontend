@@ -4,12 +4,13 @@ import { Observable, BehaviorSubject, of, timer, combineLatest } from 'rxjs';
 import { catchError, tap, map, switchMap, shareReplay } from 'rxjs/operators';
 import { Notification, NotificationResponse } from '../models/notification.model';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:8080/api/pantry';
+  private apiUrl = `${environment.apiUrl}/api/pantry`;
   
   // State management
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);

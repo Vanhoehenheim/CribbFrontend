@@ -11,9 +11,8 @@ describe('ShoppingCartService', () => {
   let mockApiService: jasmine.SpyObj<ApiService>;
 
   beforeEach(() => {
-    const apiServiceSpy = jasmine.createSpyObj('ApiService', ['getBaseUrl', 'getAuthHeaders', 'getCurrentUser']);
+    const apiServiceSpy = jasmine.createSpyObj('ApiService', ['getAuthHeaders', 'getCurrentUser'], { baseUrl: 'http://localhost:8080' });
     apiServiceSpy.getCurrentUser.and.returnValue({ id: 'user123', groupName: 'testGroup' } as any);
-    apiServiceSpy.getBaseUrl.and.returnValue('http://localhost:8080/api');
 
     TestBed.configureTestingModule({
       providers: [

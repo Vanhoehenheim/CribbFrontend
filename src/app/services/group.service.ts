@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { Observable, throwError, of } from "rxjs";
 import { catchError, delay } from "rxjs/operators";
 import { ApiService } from "./api.service";
+import { environment } from '../../environments/environment';
 
 export interface GroupDetails {
   id: string;
@@ -16,7 +17,7 @@ export interface GroupDetails {
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
-  private baseUrl = 'http://localhost:8080/api/groups';
+  private baseUrl = `${environment.apiUrl}/api/groups`;
 
   constructor(private http: HttpClient, private api: ApiService) {}
 

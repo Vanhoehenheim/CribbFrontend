@@ -8,6 +8,7 @@ import {
   UpdateCategoryRequest 
 } from '../models/category.model';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 /**
  * CategoryService handles all API interactions related to category management
@@ -18,7 +19,7 @@ import { ApiService } from './api.service';
 })
 export class CategoryService {
   // Base URL for category-related API endpoints
-  private apiUrl = 'http://localhost:8080/api/pantry';
+  private apiUrl = `${environment.apiUrl}/api/pantry`;
 
   constructor(
     private http: HttpClient,      // Angular HTTP client for API requests

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
 import { catchError, tap, delay } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 export interface Chore {
   id: string;
@@ -37,7 +38,7 @@ export interface ChoreCompletionResponse {
   providedIn: 'root'
 })
 export class ChoreService {
-  private baseUrl = 'http://localhost:8080/api/chores';
+  private baseUrl = `${environment.apiUrl}/api/chores`;
   private isSimulatedMode = false; 
 
   constructor(

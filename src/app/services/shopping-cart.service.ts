@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap, switchMap, map } from 'rxjs/operators';
 import { ShoppingCartItem } from '../models/shopping-cart-item.model'; // Import the model
 import { ApiService } from './api.service'; // Import ApiService
+import { environment } from '../../environments/environment';
 
 // Define an interface for the API list response structure
 interface ShoppingCartListResponse {
@@ -18,7 +19,7 @@ interface ShoppingCartListResponse {
 export class ShoppingCartService {
   private http = inject(HttpClient);
   private apiService = inject(ApiService); // Inject ApiService
-  private apiUrl = 'http://localhost:8080/api/shopping-cart'; // Hardcode API URL
+  private apiUrl = `${environment.apiUrl}/api/shopping-cart`;
 
   // Signal to hold the shopping cart items
   private _cartItems = signal<ShoppingCartItem[]>([]);

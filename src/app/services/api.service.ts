@@ -3,12 +3,14 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
 import { catchError, tap, delay } from 'rxjs/operators';
 import { User } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080'; // Updated based on API documentation
+  // Base URL is determined by the Angular environment configuration
+  public readonly baseUrl = environment.apiUrl; // Use environment variable
   private isSimulatedMode = false; // Set to false to use actual API
 
   // BehaviorSubject to track current user state

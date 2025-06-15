@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PantryItem, AddPantryItemRequest, UpdatePantryItemRequest, UsePantryItemRequest, UsePantryItemResponse } from '../models/pantry-item.model';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 /**
  * PantryService handles all API interactions related to pantry management
@@ -13,7 +14,7 @@ import { ApiService } from './api.service';
 })
 export class PantryService {
   // Base URL for pantry-related API endpoints
-  private apiUrl = 'http://localhost:8080/api/pantry';
+  private apiUrl = `${environment.apiUrl}/api/pantry`;
 
   constructor(
     private http: HttpClient,      // Angular HTTP client for API requests
