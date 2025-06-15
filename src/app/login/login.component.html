@@ -107,7 +107,7 @@
       {{ errorMessage }}
     </div>
 
-    <button type="submit" [disabled]="loading" class="btn-primary btn-flex w-1/2 mx-auto">
+    <button type="submit" [disabled]="loading" class="btn-primary btn-flex w-1/2 mx-auto py-2 px-4 sm:py-4 sm:px-8">
       <span *ngIf="!loading">Sign in</span>
       <span *ngIf="loading">Signing in...</span>
     </button>
