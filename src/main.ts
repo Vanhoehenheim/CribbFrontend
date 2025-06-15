@@ -3,6 +3,10 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
+import { inject } from "@vercel/analytics"
+
+// Initialize Vercel Analytics
+inject();
 
 /**
  * Application entry point
@@ -11,6 +15,6 @@ import { routes } from './app/app.routes';
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),    // Enables HTTP requests throughout the application
-    provideRouter(routes)   // Configures the Angular router with defined routes
+    provideRouter(routes),   // Configures the Angular router with defined routes
   ]
 }).catch(err => console.error(err));
