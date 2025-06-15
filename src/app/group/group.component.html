@@ -89,7 +89,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <!-- Rank circle -->
-                <div class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md text-sm md:text-base"
+                <div class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-blue-950/10 rounded-full flex items-center justify-center font-bold text-white shadow-md text-sm md:text-base"
                      [ngClass]="{
                        'bg-gradient-to-br from-yellow-400 to-yellow-600': idx === 0,
                        'bg-gradient-to-br from-gray-300 to-gray-500': idx === 1,
@@ -97,7 +97,7 @@
                        'bg-gradient-to-br from-blue-400 to-blue-600': idx > 2
                      }">
                   <span *ngIf="idx === 0">👑</span>
-                  <span *ngIf="idx !== 0">{{ idx + 1 }}</span>
+                  <span class="text-blue-950" *ngIf="idx !== 0">{{ idx + 1 }}</span>
                 </div>
                 
                 <!-- Member info -->
