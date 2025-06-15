@@ -253,7 +253,7 @@ describe('ShoppingCartComponent', () => {
       component.openAddToPantryModal(itemToAddToPantry);
       expect(component.showAddToPantryModal).toBeTrue();
       expect(component.itemForPantryModal).toBe(itemToAddToPantry);
-      expect(component.pantryCategory).toBe('');
+      expect(component.selectedCategoryId).toBe('');
       expect(component.pantryExpiryDate).toBe('');
     });
 
@@ -262,16 +262,16 @@ describe('ShoppingCartComponent', () => {
       component.closeAddToPantryModal();
       expect(component.showAddToPantryModal).toBeFalse();
       expect(component.itemForPantryModal).toBeNull();
-      expect(component.pantryCategory).toBe('');
+      expect(component.selectedCategoryId).toBe('');
       expect(component.pantryExpiryDate).toBe('');
       expect(component.addToPantryModalError).toBeNull();
      });
 
     it('should call pantryService.addItem and shoppingCartService.deleteItem on confirm', fakeAsync(() => {
-      const category = 'Dairy';
+      const categoryId = 'dairy-category-id';
       const expiry = '2024-12-31';
       component.openAddToPantryModal(itemToAddToPantry);
-      component.pantryCategory = category;
+      component.selectedCategoryId = categoryId;
       component.pantryExpiryDate = expiry;
 
       component.confirmAddToPantry();
@@ -282,7 +282,7 @@ describe('ShoppingCartComponent', () => {
       const pantryArgs = mockPantryService.addItem.calls.mostRecent().args[0];
       expect(pantryArgs.name).toBe(itemToAddToPantry.item_name);
       expect(pantryArgs.quantity).toBe(itemToAddToPantry.quantity);
-      expect(pantryArgs.category).toBe(category);
+      expect(pantryArgs.category_id).toBe(categoryId);
       expect(pantryArgs.group_name).toBe('TestGroup');
       expect(pantryArgs.expiration_date).toBeDefined(); // Check expiry was processed
       // Verify the date part in UTC, ignoring the exact time due to timezone variations
@@ -301,12 +301,12 @@ describe('ShoppingCartComponent', () => {
 
     it('should show error if category is missing on confirm', fakeAsync(() => {
       component.openAddToPantryModal(itemToAddToPantry);
-      component.pantryCategory = ''; // Missing category
+      component.selectedCategoryId = ''; // Missing category
       component.confirmAddToPantry();
 
       expect(mockPantryService.addItem).not.toHaveBeenCalled();
       expect(mockShoppingCartService.deleteItem).not.toHaveBeenCalled();
-      expect(component.addToPantryModalError).toContain('Please enter a category');
+      expect(component.addToPantryModalError).toContain('Please select a category');
       expect(component.showAddToPantryModal).toBeTrue(); // Modal should stay open
 
       tick(3000);

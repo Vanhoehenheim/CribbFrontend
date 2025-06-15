@@ -1,11 +1,20 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { 
+  iconoirEditPencil,
+  iconoirTrash,
+  iconoirCheck,
+  iconoirMenu
+} from '@ng-icons/iconoir';
 import { ShoppingCartService } from '../services/shopping-cart.service';
 import { ShoppingCartItem } from '../models/shopping-cart-item.model';
 import { PantryService } from '../services/pantry.service';
+import { CategoryService } from '../services/category.service';
 import { ApiService } from '../services/api.service';
 import { AddPantryItemRequest } from '../models/pantry-item.model';
+import { Category } from '../models/category.model';
 import { switchMap, catchError } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
 
@@ -14,14 +23,22 @@ import { EMPTY } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    NgIcon
   ],
+  providers: [provideIcons({ 
+    iconoirEditPencil,
+    iconoirTrash,
+    iconoirCheck,
+    iconoirMenu
+  })],
   templateUrl: './shopping-cart.component.html',
   styleUrl: './shopping-cart.component.css'
 })
 export class ShoppingCartComponent implements OnInit {
   private shoppingCartService = inject(ShoppingCartService);
   private pantryService = inject(PantryService);
+  private categoryService = inject(CategoryService);
   private apiService = inject(ApiService);
 
   cartItems = this.shoppingCartService.cartItems;
@@ -43,12 +60,24 @@ export class ShoppingCartComponent implements OnInit {
   // State for Add to Pantry Modal
   showAddToPantryModal: boolean = false;
   itemForPantryModal: ShoppingCartItem | null = null;
-  pantryCategory: string = '';
+  selectedCategoryId: string = '';
   pantryExpiryDate: string = '';
   isAddingToPantryInModal: boolean = false;
   addToPantryModalError: string | null = null;
 
+  // Category management
+  categories: Category[] = [];  // All available categories (predefined + custom)
+  loadingCategories = false;    // Loading state for categories
+
+  // Action menu state
+  openActionMenuId: string | null = null;
+
+  // ===== DELETE CONFIRMATION MODAL =====
+  deleteItemIdForConfirm: string | null = null;
+  showDeleteConfirm = false;
+
   ngOnInit(): void {
+    this.loadCategories();
     this.shoppingCartService.getCartItems().subscribe({
       error: (err: any) => {
         console.error('Error fetching shopping cart items:', err);
@@ -189,7 +218,7 @@ export class ShoppingCartComponent implements OnInit {
    */
   openAddToPantryModal(item: ShoppingCartItem): void {
     this.itemForPantryModal = item;
-    this.pantryCategory = ''; // Reset fields
+    this.selectedCategoryId = ''; // Reset fields
     this.pantryExpiryDate = '';
     this.addToPantryModalError = null;
     this.isAddingToPantryInModal = false;
@@ -202,7 +231,7 @@ export class ShoppingCartComponent implements OnInit {
   closeAddToPantryModal(): void {
     this.showAddToPantryModal = false;
     this.itemForPantryModal = null;
-    this.pantryCategory = '';
+    this.selectedCategoryId = '';
     this.pantryExpiryDate = '';
     this.addToPantryModalError = null;
     this.isAddingToPantryInModal = false;
@@ -213,8 +242,8 @@ export class ShoppingCartComponent implements OnInit {
    * Checks if item exists in pantry, updates quantity if it does, or adds new item if it doesn't.
    */
   confirmAddToPantry(): void {
-    if (!this.itemForPantryModal || !this.pantryCategory) {
-      this.addToPantryModalError = 'Please enter a category for the pantry item.';
+    if (!this.itemForPantryModal || !this.selectedCategoryId) {
+      this.addToPantryModalError = 'Please select a category for the pantry item.';
       setTimeout(() => this.addToPantryModalError = null, 3000);
       return;
     }
@@ -262,7 +291,7 @@ export class ShoppingCartComponent implements OnInit {
             name: existingItem.name,
             quantity: existingItem.quantity + this.itemForPantryModal!.quantity, // Add to existing quantity
             unit: existingItem.unit,
-            category: this.pantryCategory, // Use the new category from the modal
+            category_id: this.selectedCategoryId, // Use the new category from the modal
             group_name: groupName,
             expiration_date: formattedExpiryDate || existingItem.expiration_date // Use new date if provided, otherwise keep existing
           };
@@ -276,7 +305,7 @@ export class ShoppingCartComponent implements OnInit {
             name: this.itemForPantryModal!.item_name,
             quantity: this.itemForPantryModal!.quantity,
             unit: 'units', // Still using default unit
-            category: this.pantryCategory,
+            category_id: this.selectedCategoryId,
             group_name: groupName,
             expiration_date: formattedExpiryDate
           };
@@ -305,28 +334,97 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   /**
-   * Deletes an item from the shopping cart by calling the service.
-   * @param itemId The ID of the item to delete.
+   * Opens the delete confirmation modal
+   * @param itemId The ID of the item to delete
    */
-  deleteItem(itemId: string) {
-    this.error = null; // Clear previous errors
-    // Optionally add a loading state for deletion
-    // this.isDeleting[itemId] = true;
+  openDeleteConfirm(itemId: string): void {
+    this.deleteItemIdForConfirm = itemId;
+    this.showDeleteConfirm = true;
+  }
 
-    this.shoppingCartService.deleteItem(itemId).subscribe({
+  /**
+   * Cancels the delete confirmation
+   */
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+    this.deleteItemIdForConfirm = null;
+  }
+
+  /**
+   * Confirms the delete
+   */
+  confirmDelete(): void {
+    if (!this.deleteItemIdForConfirm) return;
+    const id = this.deleteItemIdForConfirm;
+    this.showDeleteConfirm = false;
+    this.deleteItemIdForConfirm = null;
+    this.shoppingCartService.deleteItem(id).subscribe({
       next: () => {
-        // Success: The service automatically refreshes the list via getCartItems()
-        console.log(`Item ${itemId} deleted successfully.`);
-        // Optionally remove deletion loading state
-        // delete this.isDeleting[itemId];
+        console.log(`Item ${id} deleted.`);
       },
-      error: (err: any) => {
-        console.error(`Error deleting item ${itemId}:`, err);
+      error: (err) => {
+        console.error('Error deleting item:', err);
         this.error = err instanceof Error ? err.message : 'Failed to delete item.';
-        // Optionally remove deletion loading state
-        // delete this.isDeleting[itemId];
-        setTimeout(() => this.error = null, 3000); // Clear error after delay
+        setTimeout(() => this.error = null, 3000);
       }
     });
+  }
+
+  /**
+   * Load categories for the current user's group
+   */
+  loadCategories(): void {
+    const currentUser = this.apiService.getCurrentUser();
+    if (!currentUser?.groupName) {
+      return;
+    }
+
+    this.loadingCategories = true;
+    this.categoryService.getCategories(currentUser.groupName)
+      .subscribe({
+        next: (response) => {
+          // Combine predefined and custom categories
+          this.categories = [
+            ...response.categories.predefined,
+            ...response.categories.user_defined
+          ];
+          this.loadingCategories = false;
+        },
+        error: (err) => {
+          console.error('Error loading categories:', err);
+          this.loadingCategories = false;
+        }
+      });
+  }
+
+  /**
+   * Check if there are any custom categories available
+   */
+  hasCustomCategories(): boolean {
+    return this.categories.some(category => category.type === 'custom');
+  }
+
+  /**
+   * Toggles the action menu for a specific item
+   * @param itemId The ID of the item
+   */
+  toggleActionMenu(itemId: string): void {
+    this.openActionMenuId = this.openActionMenuId === itemId ? null : itemId;
+  }
+
+  /**
+   * Checks if the action menu is open for a specific item
+   * @param itemId The ID of the item
+   * @returns true if the action menu is open for this item
+   */
+  isActionMenuOpen(itemId: string): boolean {
+    return this.openActionMenuId === itemId;
+  }
+
+  /**
+   * Closes the action menu
+   */
+  closeActionMenu(): void {
+    this.openActionMenuId = null;
   }
 }

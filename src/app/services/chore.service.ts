@@ -334,4 +334,16 @@ export class ChoreService {
     const headers = this.apiService.getAuthHeaders();
     return this.http.delete<{message: string}>(`${this.baseUrl}/recurring/delete?recurring_chore_id=${recurringChoreId}`, { headers });
   }
+
+  // Clear all completed chores for a group
+  clearCompletedChores(groupName: string): Observable<{deleted_count: number}> {
+    if (this.isSimulatedMode) {
+      // Simulate by just returning zero deleted after delay
+      return of({ deleted_count: 0 }).pipe(delay(500));
+    }
+
+    const headers = this.apiService.getAuthHeaders();
+    // DELETE request to /api/chores/clear-completed?group_name=...
+    return this.http.delete<{deleted_count: number}>(`${this.baseUrl}/clear-completed?group_name=${encodeURIComponent(groupName)}`, { headers });
+  }
 }

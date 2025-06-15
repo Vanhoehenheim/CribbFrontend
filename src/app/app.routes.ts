@@ -6,6 +6,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ChoresComponent } from './chores/chores.component';
 import { PantryComponent } from './components/pantry/pantry.component';
+import { GroupComponent } from './group/group.component';
+import { GroupSetupComponent } from './group-setup/group-setup.component';
 
 /**
  * Application routes configuration
@@ -17,6 +19,7 @@ export const routes: Routes = [
     { path: 'landing-page', component: LandingComponent },    // Explicit landing page route
     { path: 'login', component: LoginComponent },             // User login page
     { path: 'signup', component: SignupComponent },           // New user registration
+    { path: 'group-setup', component: GroupSetupComponent },  // Setup group after login if none
     
     // Protected routes requiring authentication
     { path: 'profile', component: ProfileComponent },         // User profile page
@@ -32,7 +35,8 @@ export const routes: Routes = [
         // Feature routes as children of dashboard
         { path: 'chores', component: ChoresComponent },       // Household chores feature
         { path: 'pantry', component: PantryComponent },        // Pantry management feature
-        { path: 'shopping-cart', loadComponent: () => import('./shopping-cart/shopping-cart.component').then(m => m.ShoppingCartComponent) } // Shopping Cart feature
+        { path: 'shopping-cart', loadComponent: () => import('./shopping-cart/shopping-cart.component').then(m => m.ShoppingCartComponent) }, // Shopping Cart feature
+        { path: 'group', component: GroupComponent }, // Household group & leaderboard
       ]
     },
 ];

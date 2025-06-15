@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ViewContainerRef, ComponentRef, OnDestroy, Renderer2, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Notification, NotificationType } from '../../../models/notification.model';
 import { ShoppingCartService } from '../../../services/shopping-cart.service';
@@ -14,16 +14,21 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './notification-item.component.html',
   styleUrls: ['./notification-item.component.css']
 })
-export class NotificationItemComponent {
+export class NotificationItemComponent implements OnDestroy {
   @Input() notification!: Notification;
   @Output() markAsRead = new EventEmitter<string>();
   @Output() delete = new EventEmitter<string>();
+  @ViewChild('addToCartModalTemplate', { static: false }) modalTemplate!: TemplateRef<any>;
 
   private shoppingCartService = inject(ShoppingCartService);
+  private renderer = inject(Renderer2);
+  private elementRef = inject(ElementRef);
+  
   showAddToCartModal: boolean = false;
   quantityForCartModal: number = 1;
   isAddingToCartInModal: boolean = false;
   addToCartModalError: string | null = null;
+  private modalElement: HTMLElement | null = null;
 
   // Make enum accessible in template
   NotificationType = NotificationType;
@@ -99,6 +104,7 @@ export class NotificationItemComponent {
     this.addToCartModalError = null;
     this.isAddingToCartInModal = false;
     this.showAddToCartModal = true;
+    
     console.log('Opening add to cart modal for:', this.notification.item_name);
   }
 
@@ -107,6 +113,7 @@ export class NotificationItemComponent {
    */
   closeAddToCartModal(): void {
     this.showAddToCartModal = false;
+    this.cleanupModal();
     console.log('Closing add to cart modal.');
   }
 
@@ -146,5 +153,22 @@ export class NotificationItemComponent {
           }
         }
       });
+  }
+
+  /**
+   * Cleanup when component is destroyed
+   */
+  ngOnDestroy(): void {
+    this.cleanupModal();
+  }
+
+  /**
+   * Clean up modal element if it exists
+   */
+  private cleanupModal(): void {
+    if (this.modalElement && this.modalElement.parentNode) {
+      this.modalElement.parentNode.removeChild(this.modalElement);
+      this.modalElement = null;
+    }
   }
 } 

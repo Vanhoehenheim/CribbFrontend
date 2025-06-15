@@ -14,6 +14,9 @@ import { Subscription } from 'rxjs';
 })
 export class NotificationPanelComponent implements OnInit, OnDestroy {
   @Output() closeDropdown = new EventEmitter<void>();
+  @Output() markAsReadClicked = new EventEmitter<string>();
+  @Output() deleteNotificationClicked = new EventEmitter<string>();
+  @Output() navigateToAllClicked = new EventEmitter<void>();
   
   notifications: Notification[] = [];
   activeTab: 'pantry' | 'chores' = 'pantry';
@@ -40,15 +43,16 @@ export class NotificationPanelComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
   }
   
-  markAsRead(notificationId: string): void {
-    this.notificationService.markAsRead(notificationId).subscribe();
+  onMarkAsRead(notificationId: string): void {
+    this.markAsReadClicked.emit(notificationId);
   }
   
-  deleteNotification(notificationId: string): void {
-    this.notificationService.deleteNotification(notificationId).subscribe();
+  onDeleteNotification(notificationId: string): void {
+    this.deleteNotificationClicked.emit(notificationId);
   }
   
-  navigateToAll(): void {
+  onNavigateToAll(): void {
+    this.navigateToAllClicked.emit();
     this.closeDropdown.emit();
   }
 }

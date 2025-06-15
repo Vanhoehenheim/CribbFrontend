@@ -1,0 +1,213 @@
+<!-- Group Setup Page -->
+<div class="min-h-screen flex flex-col items-center justify-center space-y-12 px-4 py-8 relative">
+  <!-- Animated Background -->
+  <svg class="fixed top-0 left-0 w-full h-screen -z-10" preserveAspectRatio="xMidYMid slice" viewBox="10 10 80 80">
+    <defs>
+      <filter id="blur">
+        <feGaussianBlur stdDeviation="1"/>
+      </filter>
+      <style>
+        @keyframes rotate {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        .out-top {
+          animation: rotate 20s linear infinite;
+          transform-origin: 13px 25px;
+        }
+        .in-top {
+          animation: rotate 10s linear infinite;
+          transform-origin: 13px 25px;
+        }
+        .out-bottom {
+          animation: rotate 25s linear infinite;
+          transform-origin: 84px 93px;
+        }
+        .in-bottom {
+          animation: rotate 15s linear infinite;
+          transform-origin: 84px 93px;
+        }
+      </style>
+    </defs>
+    <path fill="#578FCA" class="out-top" filter="url(#blur)" d="M37-5C25.1-14.7,5.7-19.1-9.2-10-28.5,1.8-32.7,31.1-19.8,49c15.5,21.5,52.6,22,67.2,2.3C59.4,35,53.7,8.5,37-5Z"/>
+    <path fill="#A1E3F9" class="in-top" filter="url(#blur)" d="M20.6,4.1C11.6,1.5-1.9,2.5-8,11.2-16.3,23.1-8.2,45.6,7.4,50S42.1,38.9,41,24.5C40.2,14.1,29.4,6.6,20.6,4.1Z"/>
+    <path fill="#578FCA" class="out-bottom" filter="url(#blur)" d="M105.9,48.6c-12.4-8.2-29.3-4.8-39.4.8-23.4,12.8-37.7,51.9-19.1,74.1s63.9,15.3,76-5.6c7.6-13.3,1.8-31.1-2.3-43.8C117.6,63.3,114.7,54.3,105.9,48.6Z"/>
+    <path fill="#A1E3F9" class="in-bottom" filter="url(#blur)" d="M102,67.1c-9.6-6.1-22-3.1-29.5,2-15.4,10.7-19.6,37.5-7.6,47.8s35.9,3.9,44.5-12.5C115.5,92.6,113.9,74.6,102,67.1Z"/>
+  </svg>
+
+  <!-- Main heading with background-->
+  <div class="text-center bg-white/20 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/30 shadow-2xl max-w-2xl mx-auto">
+    <h1
+      class="text-4xl md:text-6xl font-loopet text-blue-950 mb-6"
+    >
+      Set up your Household
+    </h1>
+    <p class="text-lg md:text-xl tracking-tight text-blue-950/90 max-w-md mx-auto">
+      Join an existing household using a group code or create a new one for your roommates.
+    </p>
+  </div>
+
+  <!-- Buttons container -->
+  <div class="flex flex-col sm:flex-row gap-6 w-full max-w-lg">
+    <button (click)="openJoinModal()" class="btn-primary btn-flex border-4 px-4 py-2 text-base md:px-6 md:py-3 md:text-lg">Join Group</button>
+    <button (click)="openCreateModal()" class="btn-secondary btn-flex border-4 px-4 py-2 text-base md:px-6 md:py-3 md:text-lg">Create Group</button>
+  </div>
+</div>
+
+<!-- Join Group Modal -->
+<div id="join-modal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4 bg-black/50 backdrop-blur-sm">
+  <div class="relative w-full max-w-2xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-lg border-2 border-blue-950/30 rounded-2xl shadow-2xl">
+    <!-- Modal Header -->
+    <div class="sticky top-0 bg-white/95 backdrop-blur-lg border-b border-blue-950/20 p-4 md:p-6 rounded-t-2xl">
+      <div class="flex items-center justify-center relative">
+        <h3 class="text-lg md:text-xl fancy font-bold font-loopet text-blue-950 relative">Join Group</h3>
+        <!-- Close button -->
+        <button type="button" (click)="closeJoinModal()" class="p-2 hover:bg-blue-950/10 rounded-full transition-all duration-200 absolute right-0 md:right-4">
+          <svg class="w-5 h-5 md:w-6 md:h-6 text-blue-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-4 md:p-6">
+      <div class="space-y-4 md:space-y-6">
+        <form [formGroup]="joinGroupForm" (ngSubmit)="joinGroup()">
+          <div class="grid grid-cols-1 gap-4 md:gap-6">
+            <!-- Group Code -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Group Code*</label>
+              <input 
+                type="text" 
+                formControlName="groupCode" 
+                class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 text-sm md:text-base" 
+                [ngClass]="{ 'border-red-500 border-2': joinSubmitted && jf['groupCode'].errors }"
+                placeholder="Enter group code"
+              />
+            </div>
+
+            <!-- Room Number -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Room Number*</label>
+              <input 
+                type="text" 
+                formControlName="roomNo" 
+                class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 text-sm md:text-base" 
+                [ngClass]="{ 'border-red-500 border-2': joinSubmitted && jf['roomNo'].errors }"
+                placeholder="Enter your room number"
+              />
+            </div>
+          </div>
+
+          <!-- Error message display -->
+          <div *ngIf="errorMessage" class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-3 md:px-4 py-2 md:py-3 rounded-lg mt-4 md:mt-6 text-sm md:text-base" role="alert">
+            <span class="block sm:inline font-medium">⚠️ {{ errorMessage }}</span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="sticky bottom-0 bg-white/95 backdrop-blur-lg border-t border-blue-950/20 p-4 md:p-6 rounded-b-2xl">
+      <div class="flex justify-center space-x-3 md:space-x-4">
+        <button
+          type="button"
+          (click)="closeJoinModal()"
+          class="btn btn-sm px-4 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-red-500 backdrop-blur-sm text-sm md:text-base"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="joinGroup()"
+          [disabled]="loading"
+          class="btn btn-sm px-4 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950 backdrop-blur-sm text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ loading ? 'Processing...' : 'Join' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Group Modal -->
+<div id="create-modal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4 bg-black/50 backdrop-blur-sm">
+  <div class="relative w-full max-w-2xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-lg border-2 border-blue-950/30 rounded-2xl shadow-2xl">
+    <!-- Modal Header -->
+    <div class="sticky top-0 bg-white/95 backdrop-blur-lg border-b border-blue-950/20 p-4 md:p-6 rounded-t-2xl">
+      <div class="flex items-center justify-center relative">
+        <h3 class="text-lg md:text-xl fancy font-bold font-loopet text-blue-950 relative">Create Group</h3>
+        <!-- Close button -->
+        <button type="button" (click)="closeCreateModal()" class="p-2 hover:bg-blue-950/10 rounded-full transition-all duration-200 absolute right-0 md:right-4">
+          <svg class="w-5 h-5 md:w-6 md:h-6 text-blue-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-4 md:p-6">
+      <div class="space-y-4 md:space-y-6">
+        <form [formGroup]="createGroupForm" (ngSubmit)="createGroup()">
+          <div class="grid grid-cols-1 gap-4 md:gap-6">
+            <!-- Group Name -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Group Name*</label>
+              <input 
+                type="text" 
+                formControlName="group" 
+                class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 text-sm md:text-base" 
+                [ngClass]="{ 'border-red-500 border-2': createSubmitted && cf['group'].errors }"
+                placeholder="Enter group name"
+              />
+            </div>
+
+            <!-- Room Number -->
+            <div>
+              <label class="block text-sm font-bold text-blue-950 mb-2">Room Number*</label>
+              <input 
+                type="text" 
+                formControlName="roomNo" 
+                class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 text-sm md:text-base" 
+                [ngClass]="{ 'border-red-500 border-2': createSubmitted && cf['roomNo'].errors }"
+                placeholder="Enter your room number"
+              />
+            </div>
+          </div>
+
+          <!-- Error message display -->
+          <div *ngIf="errorMessage" class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-3 md:px-4 py-2 md:py-3 rounded-lg mt-4 md:mt-6 text-sm md:text-base" role="alert">
+            <span class="block sm:inline font-medium">⚠️ {{ errorMessage }}</span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="sticky bottom-0 bg-white/95 backdrop-blur-lg border-t border-blue-950/20 p-4 md:p-6 rounded-b-2xl">
+      <div class="flex justify-center space-x-3 md:space-x-4">
+        <button
+          type="button"
+          (click)="closeCreateModal()"
+          class="btn btn-sm px-4 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-red-500 backdrop-blur-sm text-sm md:text-base"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="createGroup()"
+          [disabled]="loading"
+          class="btn btn-sm px-4 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950 backdrop-blur-sm text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ loading ? 'Processing...' : 'Create Group' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

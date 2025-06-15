@@ -60,10 +60,14 @@ export class LoginComponent {
         // Show success message
         this.showSuccessMessage();
         
-        // Navigate to dashboard page after successful login instead of profile
+        // Decide destination based on group membership
+        const user = this.apiService.getCurrentUser();
+        const hasGroup = user && (user.groupName || user.groupCode);
+        const target = hasGroup ? '/dashboard' : '/group-setup';
+
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 1000); // Short delay for better UX
+          this.router.navigate([target]);
+        }, 800); // Short delay for better UX
       },
       error: (error) => {
         console.error('Login failed', error);

@@ -14,9 +14,116 @@
   @apply bg-slate-900 text-white;
 }
 
+/* Mobile bottom navigation items */
+.mobile-bottom-nav-item {
+  @apply p-2 text-blue-950
+         rounded-lg
+         hover:bg-blue-950/10
+         transition-all duration-200 ease-in-out
+         focus:outline-none;
+}
+
+/* Active state for mobile bottom navigation */
+.mobile-bottom-nav-active .w-10 {
+  @apply bg-blue-950 border-blue-950;
+}
+
+.mobile-bottom-nav-active svg {
+  @apply text-white;
+}
+
+.mobile-bottom-nav-active span {
+  @apply text-white font-bold;
+}
+
+/* Mobile navigation items - matching notification item styling */
+.mobile-nav-item {
+  @apply block w-full p-3 text-sm font-bold text-black
+         rounded-xl border-2 border-blue-950
+         bg-blue-200/20 backdrop-blur-sm
+         hover:bg-blue-950 hover:text-white
+         transition-all duration-200 ease-in-out
+         focus:outline-none;
+}
+
+/* Active state for mobile navigation */
+.mobile-nav-active {
+  @apply bg-blue-950 text-white border-blue-950;
+}
+
 /* Mobile menu styles */
 @media (max-width: 768px) {
   .nav-pill {
-    @apply w-full justify-center mb-2;
+    @apply w-full justify-center mb-2 py-3 text-base;
   }
+
+  /* Full-screen mobile menu with backdrop blur */
+  #mobile-menu {
+    animation: fadeIn 0.3s ease-out;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  #mobile-menu.hidden {
+    animation: fadeOut 0.2s ease-in;
+  }
+
+  /* Navigation panel slide animation */
+  #mobile-menu .absolute {
+    animation: slideDownFade 0.3s ease-out;
+  }
+
+  #mobile-menu.hidden .absolute {
+    animation: slideUpFade 0.2s ease-in;
+  }
+}
+
+/* Full-screen mobile menu animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+/* Hamburger icon animation */
+.hamburger-icon {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hamburger-icon.open {
+  transform: rotate(90deg);
 }

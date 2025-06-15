@@ -55,13 +55,13 @@ export class PantryService {
   /**
    * List all pantry items for a household, optionally filtered by category
    * @param groupName - Name of the household group
-   * @param category - Optional category to filter by
+   * @param categoryId - Optional category ID to filter by
    * @returns Observable with array of pantry items
    */
-  listItems(groupName: string, category?: string): Observable<PantryItem[]> {
+  listItems(groupName: string, categoryId?: string): Observable<PantryItem[]> {
     let url = `${this.apiUrl}/list?group_name=${groupName}`;
-    if (category) {
-      url += `&category=${category}`;
+    if (categoryId) {
+      url += `&category_id=${categoryId}`;
     }
     const headers = this.apiService.getAuthHeaders();
     return this.http.get<PantryItem[]>(url, { headers });

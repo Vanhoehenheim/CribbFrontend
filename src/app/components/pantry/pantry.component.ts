@@ -2,12 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PantryService } from '../../services/pantry.service';
+import { CategoryService } from '../../services/category.service';
 import { PantryItem } from '../../models/pantry-item.model';
+import { Category } from '../../models/category.model';
 import { AddItemComponent } from './add-item/add-item.component';
 import { ApiService } from '../../services/api.service';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { 
+  iconoirMenu,
+  iconoirEditPencil,
+  iconoirCart,
+  iconoirTrash
+} from '@ng-icons/iconoir';
 
 /**
  * PantryComponent manages the household's food inventory
@@ -18,7 +27,15 @@ import { of } from 'rxjs';
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, AddItemComponent]
+  imports: [CommonModule, FormsModule, AddItemComponent, NgIcon],
+  providers: [
+    provideIcons({
+      iconoirMenu,
+      iconoirEditPencil,
+      iconoirCart,
+      iconoirTrash
+    })
+  ]
 })
 export class PantryComponent implements OnInit {
   // Main items collections 
@@ -28,13 +45,13 @@ export class PantryComponent implements OnInit {
   expiredItems: number = 0;                // Total number of items in the pantry
   
   // Filter state
-  selectedCategory: string = '';           // Currently selected category filter
-  categories: string[] = [];               // Deprecated - using allCategories instead
-  allCategories: string[] = [];            // All unique categories from pantry items
+  selectedCategoryId: string = '';         // Currently selected category ID filter
+  categories: Category[] = [];             // All available categories (predefined + custom)
+  loadingCategories = false;               // Loading state for categories
   
   // UI state
   loading: boolean = false;                // Loading indicator state
-  error: string = '';                      // Error message to display
+  error: string | null = null;              // Error message to display
   showAddItemForm: boolean = false;        // Controls visibility of add item form
   // addToCartSuccessMessage: string | null = null; // Removed: Handled in modal now
   // addToCartError: string | null = null; // Removed: Handled in modal now
@@ -53,8 +70,18 @@ export class PantryComponent implements OnInit {
   newQuantity: number = 0;                 // New quantity for item updates
   newExpiryDate: string = '';              // New expiry date for item updates
 
+  // Dropdown menu states
+  openMenuItemId: string | null = null;    // ID of item with open action menu
+  showAdditionalCategoriesDropdown: boolean = false; // State for additional categories dropdown
+  showMobileCategoriesDropdown: boolean = false; // State for mobile categories dropdown
+
+  // ===== DELETE CONFIRMATION MODAL STATE =====
+  deleteItemIdForConfirm: string | null = null; // Item ID pending deletion confirmation
+  showDeleteConfirm: boolean = false;
+
   constructor(
     private pantryService: PantryService,  // Service for pantry CRUD operations
+    private categoryService: CategoryService, // Service for category operations
     private apiService: ApiService,         // Service for user and auth operations
     private shoppingCartService: ShoppingCartService // Inject ShoppingCartService
   ) {}
@@ -114,16 +141,19 @@ export class PantryComponent implements OnInit {
       // This handles different user object structures
       if (userData.groupName) {
         this.groupName = userData.groupName;
-        this.loadAllPantryItems();}
-        else if (userData.groupCode) {
+        this.loadCategories();
+        this.loadAllPantryItems();
+      } else if (userData.groupCode) {
         // Fallback if we only have a group code
         this.groupName = 'Pantry'; 
         console.log('Using test group name. Consider implementing a getGroupDetails API call');
+        this.loadCategories();
         this.loadAllPantryItems();
       } else {
         // Development fallback
         this.groupName = 'Pantry';
         console.log('Using hardcoded group name for testing');
+        this.loadCategories();
         this.loadAllPantryItems();
       }
     } else {
@@ -155,9 +185,6 @@ export class PantryComponent implements OnInit {
             selectedQuantity: 1
           }));
           
-          // Extract unique categories for the filter buttons
-          this.allCategories = [...new Set(items.map(item => item.category))];
-          
           // Apply any active category filter
           this.filterItems();
           
@@ -174,25 +201,98 @@ export class PantryComponent implements OnInit {
   }
 
   /**
-   * Filter pantry items based on selected category
+   * Load categories for the current group
+   */
+  loadCategories(): void {
+    if (!this.groupName) {
+      return;
+    }
+
+    this.loadingCategories = true;
+    this.categoryService.getCategories(this.groupName)
+      .subscribe({
+        next: (response) => {
+          // Combine predefined and custom categories
+          this.categories = [
+            ...response.categories.predefined,
+            ...response.categories.user_defined
+          ];
+          this.loadingCategories = false;
+        },
+        error: (err) => {
+          console.error('Error loading categories:', err);
+          this.error = 'Failed to load categories';
+          this.loadingCategories = false;
+        }
+      });
+  }
+
+  /**
+   * Get category name by ID
+   */
+  getCategoryName(categoryId: string): string {
+    const category = this.categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'Unknown Category';
+  }
+
+  /**
+   * Get categories that have at least one item
+   */
+  getCategoriesWithItems(): Category[] {
+    if (!this.pantryItems || this.pantryItems.length === 0) {
+      return [];
+    }
+    
+    // Get unique category IDs from pantry items
+    const categoryIdsWithItems = new Set(
+      this.pantryItems.map(item => item.category_id).filter(id => id)
+    );
+    
+    // Return categories that have items
+    return this.categories.filter(category => 
+      categoryIdsWithItems.has(category.id)
+    );
+  }
+
+  /**
+   * Get categories that don't have any items
+   */
+  getCategoriesWithoutItems(): Category[] {
+    if (!this.pantryItems || this.pantryItems.length === 0) {
+      return this.categories;
+    }
+    
+    // Get unique category IDs from pantry items
+    const categoryIdsWithItems = new Set(
+      this.pantryItems.map(item => item.category_id).filter(id => id)
+    );
+    
+    // Return categories that don't have items
+    return this.categories.filter(category => 
+      !categoryIdsWithItems.has(category.id)
+    );
+  }
+
+  /**
+   * Filter pantry items based on selected category ID
    * Updates filteredItems which drives the UI
    */
   filterItems(): void {
-    if (!this.selectedCategory) {
+    if (!this.selectedCategoryId) {
       this.filteredItems = this.pantryItems; // Show all items
     } else {
       this.filteredItems = this.pantryItems.filter(
-        item => item.category === this.selectedCategory
+        item => item.category_id === this.selectedCategoryId
       );
     }
   }
 
   /**
    * Handle category filter selection
-   * @param category - The selected category to filter by
+   * @param categoryId - The selected category ID to filter by
    */
-  onCategoryChange(category: string): void {
-    this.selectedCategory = category;
+  onCategoryChange(categoryId: string): void {
+    this.selectedCategoryId = categoryId;
     this.filterItems();
   }
 
@@ -362,7 +462,7 @@ export class PantryComponent implements OnInit {
       name: this.itemToUpdate.name,
       quantity: this.newQuantity,
       unit: this.itemToUpdate.unit,
-      category: this.itemToUpdate.category,
+      category_id: this.itemToUpdate.category_id,
       group_name: this.groupName,
       expiration_date: formattedExpiryDate
     }).subscribe({
@@ -383,6 +483,33 @@ export class PantryComponent implements OnInit {
    */
   saveQuantityUpdate(): void {
     this.saveItemUpdate();
+  }
+
+  /**
+   * Toggle the action menu dropdown for a specific item
+   * @param itemId - ID of the item to toggle menu for
+   */
+  toggleActionMenu(itemId: string): void {
+    if (this.openMenuItemId === itemId) {
+      this.openMenuItemId = null; // Close menu if already open
+    } else {
+      this.openMenuItemId = itemId; // Open menu for this item
+    }
+  }
+
+  /**
+   * Close the action menu dropdown
+   */
+  closeActionMenu(): void {
+    this.openMenuItemId = null;
+  }
+
+  /**
+   * Check if action menu is open for a specific item
+   * @param itemId - ID of the item to check
+   */
+  isActionMenuOpen(itemId: string): boolean {
+    return this.openMenuItemId === itemId;
   }
 
   /**
@@ -440,6 +567,80 @@ export class PantryComponent implements OnInit {
           this.closeAddToCartModal(); // Close modal on success
         }
         // Error case is handled in catchError, message is displayed in modal
+      });
+  }
+
+  /**
+   * Toggle the visibility of the additional categories dropdown
+   */
+  toggleAdditionalCategoriesDropdown(): void {
+    this.showAdditionalCategoriesDropdown = !this.showAdditionalCategoriesDropdown;
+  }
+
+  /**
+   * Close the additional categories dropdown
+   */
+  closeAdditionalCategoriesDropdown(): void {
+    this.showAdditionalCategoriesDropdown = false;
+  }
+
+  /**
+   * Toggle the visibility of the mobile categories dropdown
+   */
+  toggleMobileCategoriesDropdown(): void {
+    this.showMobileCategoriesDropdown = !this.showMobileCategoriesDropdown;
+  }
+
+  /**
+   * Close the mobile categories dropdown
+   */
+  closeMobileCategoriesDropdown(): void {
+    this.showMobileCategoriesDropdown = false;
+  }
+
+  /**
+   * Get the display name of the currently selected category
+   */
+  getSelectedCategoryName(): string {
+    if (!this.selectedCategoryId) {
+      return 'All Items';
+    }
+    const category = this.categories.find(cat => cat.id === this.selectedCategoryId);
+    return category ? category.name : 'All Items';
+  }
+
+  /**
+   * Open the nicely-styled confirmation modal before deleting an item
+   */
+  openDeleteConfirm(itemId: string): void {
+    this.deleteItemIdForConfirm = itemId;
+    this.showDeleteConfirm = true;
+  }
+
+  /** Cancel deletion */
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+    this.deleteItemIdForConfirm = null;
+  }
+
+  /** Perform deletion after confirmation */
+  confirmDelete(): void {
+    if (!this.deleteItemIdForConfirm) {
+      return;
+    }
+    const itemId = this.deleteItemIdForConfirm;
+    this.showDeleteConfirm = false;
+    this.deleteItemIdForConfirm = null;
+    this.pantryService.deleteItem(itemId)
+      .subscribe({
+        next: () => {
+          this.loadAllPantryItems();
+        },
+        error: (err) => {
+          this.error = 'Failed to delete item';
+          console.error('Error deleting item:', err);
+          setTimeout(() => this.error = null, 3000);
+        }
       });
   }
 }

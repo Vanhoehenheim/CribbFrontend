@@ -1,23 +1,143 @@
 /* Styles for notification dropdown */
 
-/* Add transitions for smoother open/close */
-.notification-dropdown-enter {
-  opacity: 0;
-  transform: translateY(-10px);
+/* Full-screen overlay animations */
+.notification-overlay {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.notification-dropdown-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 200ms, transform 200ms;
+.notification-overlay.hidden {
+  animation: fadeOut 0.2s ease-in;
 }
 
-.notification-dropdown-exit {
-  opacity: 1;
+/* Panel animations */
+.notification-panel {
+  animation: slideDownFade 0.3s ease-out;
 }
 
-.notification-dropdown-exit-active {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 200ms, transform 200ms;
+.notification-panel.hidden {
+  animation: slideUpFade 0.2s ease-in;
+}
+
+/* Responsive positioning for mobile */
+@media (max-width: 768px) {
+  /* Full-width dropdown on mobile */
+  .notification-panel-mobile {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 0 0 1rem 1rem !important;
+  }
+  
+  /* Adjust panel margins on mobile */
+  .panel-container-mobile {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Smooth entrance/exit animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+/* Enhanced mobile animations */
+@media (max-width: 768px) {
+  @keyframes slideDownFade {
+    from {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  @keyframes slideUpFade {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+    }
+  }
+}
+
+/* Touch-friendly hover states */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  .hover\:scale-105:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Ensure proper z-index layering - navbar should always be visible */
+.notification-overlay {
+  z-index: 30;
+}
+
+/* Navbar protection - ensure it's never covered */
+nav {
+  z-index: 50 !important;
+  position: relative !important;
+}
+
+/* Lighter blur effects for better navbar visibility */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Ensure notification panel has proper opacity */
+.notification-panel-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 } 

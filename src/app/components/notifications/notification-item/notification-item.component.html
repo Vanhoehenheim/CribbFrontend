@@ -1,126 +1,112 @@
-<div 
-  class="flex items-center justify-between p-3 border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-  [ngClass]="{'bg-gray-50 dark:bg-gray-700': !notification.is_read}"
+<!-- Simplified notification item matching navigation style -->
+<div
+  class="p-2 md:p-3 transition-all duration-200 rounded-lg hover:bg-blue-200/30 mb-1"
+  [ngClass]="{'bg-blue-200/20': !notification.is_read, 'bg-transparent': notification.is_read}"
 >
-  <div class="flex items-start gap-3 flex-1">
-    <!-- Icon based on notification type -->
-    <div [ngClass]="getTypeClass()">
-      <svg *ngIf="notification.type === NotificationType.EXPIRED" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      
-      <svg *ngIf="notification.type === NotificationType.EXPIRING" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      
-      <svg *ngIf="notification.type === NotificationType.LOW_STOCK" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-      
-      <svg *ngIf="notification.type === NotificationType.OUT_OF_STOCK" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+  <!-- Content with clean layout -->
+  <div class="flex justify-between items-start gap-3">
+    <!-- Text content -->
+    <div class="flex-1 min-w-0">
+      <h3 class="font-bold text-black text-sm mb-1 truncate">{{ notification.item_name }}</h3>
+      <p class="text-xs text-blue-950/70 font-medium">{{ notification.message }} • {{ formatDate(notification.created_at) }}</p>
     </div>
     
-    <!-- Notification content -->
-    <div class="flex-1">
-      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ notification.item_name }}</p>
-      <p class="text-xs text-gray-500 dark:text-gray-400">{{ notification.message }}</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500">{{ formatDate(notification.created_at) }}</p>
-    </div>
-  </div>
-  
-  <!-- Actions -->
-  <div class="flex flex-col items-end space-y-1">
-    <div class="flex gap-2">
-      <!-- Mark as read button (if unread) -->
+    <!-- Action buttons - compact and clean -->
+    <div class="flex gap-1 flex-shrink-0">
+      <!-- Add to Cart button (only for low/out of stock) -->
+      <button
+        *ngIf="notification.type === NotificationType.LOW_STOCK || notification.type === NotificationType.OUT_OF_STOCK"
+        (click)="openAddToCartModal($event)"
+        class="p-1.5 rounded-md hover:bg-blue-950 hover:text-white transition-colors touch-manipulation"
+        title="Add to cart"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-3.5 h-3.5 fill-current">
+          <path d="M2.997 3.496a.5.5 0 0 1 .5-.5h.438c.727 0 1.145.473 1.387.945c.165.323.284.717.383 1.059H16a1 1 0 0 1 .962 1.272l-1.496 5.275A2 2 0 0 1 13.542 13H8.463a2 2 0 0 1-1.93-1.473l-.642-2.355l-.01-.032l-1.03-3.498l-.1-.337c-.1-.346-.188-.652-.32-.909c-.159-.31-.305-.4-.496-.4h-.438a.5.5 0 0 1-.5-.5M8.5 17a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m5 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3"/>
+        </svg>
+      </button>
+
+      <!-- Mark as read (if unread) -->
       <button
         *ngIf="!notification.is_read"
-        class="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-100 dark:hover:bg-gray-600"
         (click)="onMarkAsRead($event)"
+        class="p-1.5 rounded-md hover:bg-blue-950 hover:text-white transition-colors touch-manipulation"
         title="Mark as read"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
       </button>
 
       <!-- Delete button -->
       <button
-        class="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-100 dark:hover:bg-gray-600"
         (click)="onDelete($event)"
+        class="p-1.5 rounded-md hover:bg-red-500 hover:text-white transition-colors touch-manipulation"
         title="Delete notification"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5">
+          <path d="M7 3h2a1 1 0 0 0-2 0ZM6 3a2 2 0 1 1 4 0h4a.5.5 0 0 1 0 1h-.564l-1.205 8.838A2.5 2.5 0 0 1 9.754 15H6.246a2.5 2.5 0 0 1-2.477-2.162L2.564 4H2a.5.5 0 0 1 0-1h4Zm1 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0v-5ZM9.5 6a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5Zm-4.74 6.703A1.5 1.5 0 0 0 6.246 14h3.508a1.5 1.5 0 0 0 1.487-1.297L12.427 4H3.573l1.187 8.703Z"/>
         </svg>
       </button>
     </div>
-
-    <!-- Add to Cart button -->
-    <button
-      *ngIf="notification.type === NotificationType.LOW_STOCK || notification.type === NotificationType.OUT_OF_STOCK"
-      (click)="openAddToCartModal($event)" 
-      class="mt-1 flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors duration-150 border border-green-500 text-green-600 hover:bg-green-50 dark:border-green-400 dark:text-green-300 dark:hover:bg-gray-600"
-      title="Add to cart"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-      Add to Cart
-    </button>
   </div>
 </div>
 
-<!-- Add to Cart Modal -->
-<div *ngIf="showAddToCartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" (click)="closeAddToCartModal()"> <!-- Close on backdrop click -->
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6" (click)="$event.stopPropagation()"> <!-- Prevent closing on modal content click -->
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Add to Cart</h2>
-      <button (click)="closeAddToCartModal()" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<!-- Add to Cart Modal rendered in a Portal-like fashion outside the normal flow -->
+
+<!-- Modal rendered outside the notification container using Angular Portal-like approach -->
+<ng-container *ngIf="showAddToCartModal">
+  <div class="add-to-cart-modal-overlay" 
+       style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; padding: 0.75rem;"
+       (click)="closeAddToCartModal()">
+    <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl border-2 border-blue-950 w-full max-w-xs md:max-w-sm p-4 md:p-6" 
+         (click)="$event.stopPropagation()"
+         style="z-index: 100000; position: relative;">
+    <div class="flex justify-between items-center mb-3 md:mb-4">
+      <h2 class="text-lg md:text-xl font-semibold text-blue-950 font-loopet">Add to Cart</h2>
+      <button (click)="closeAddToCartModal()" class="text-blue-950 hover:text-blue-950/70 p-1 touch-manipulation">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
 
-    <p class="mb-4 text-gray-700 dark:text-gray-300">How many <strong class="font-medium text-gray-900 dark:text-white">{{ notification?.item_name }}</strong> would you like to add?</p>
+    <p class="mb-3 md:mb-4 text-sm md:text-base text-blue-950">How many <strong class="font-medium">{{ notification?.item_name }}</strong> would you like to add?</p>
 
-    <form (ngSubmit)="confirmAddToCart()" class="space-y-4">
+    <form (ngSubmit)="confirmAddToCart()" class="space-y-3 md:space-y-4">
       <div>
-        <label for="addToCartQuantityNotif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label for="addToCartQuantityNotif" class="block text-sm font-medium text-blue-950 mb-1">
           Quantity*
         </label>
         <input
-          id="addToCartQuantityNotif" 
+          id="addToCartQuantityNotif"
           type="number"
           [(ngModel)]="quantityForCartModal"
           name="addToCartQuantityNotif"
           required
           min="1"
-          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          class="w-full px-3 py-2 md:py-2.5 border border-blue-950/30 rounded-lg shadow-sm bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 text-sm md:text-base touch-manipulation"
         />
       </div>
 
       <!-- Error Display -->
-      <div *ngIf="addToCartModalError" class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-md mt-3 text-sm" role="alert">
+      <div *ngIf="addToCartModalError" class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-3 md:px-4 py-2 md:py-3 rounded-lg text-sm" role="alert">
         {{ addToCartModalError }}
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex justify-end space-x-3 pt-4">
+      <!-- Action Buttons with responsive sizing -->
+      <div class="flex justify-end space-x-2 md:space-x-3 pt-3 md:pt-4">
         <button
           type="button"
           (click)="closeAddToCartModal()"
           [disabled]="isAddingToCartInModal"
-          class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-3 md:px-4 py-2 text-sm font-medium text-blue-950 bg-white/30 hover:bg-white/50 rounded-lg transition-all duration-150 border border-blue-950/30 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
         >
           Cancel
         </button>
         <button
           type="submit"
           [disabled]="isAddingToCartInModal || quantityForCartModal <= 0"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          class="px-3 md:px-4 py-2 text-sm font-medium text-white bg-[#578FCA] hover:bg-[#578FCA]/80 rounded-lg transition-all duration-150 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center touch-manipulation"
         >
           <svg *ngIf="isAddingToCartInModal" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -130,5 +116,6 @@
         </button>
       </div>
     </form>
+    </div>
   </div>
-</div> 
+</ng-container> 

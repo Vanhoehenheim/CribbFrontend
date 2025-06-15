@@ -1,3 +1,4 @@
+<!-- Top Navigation Bar -->
 <nav class="fixed top-0 left-0 w-full z-50">
   <div class="flex items-center justify-between px-6 py-3 mx-auto">
     <!-- Logo -->
@@ -5,8 +6,8 @@
       <span class="text-2xl font-loopet text-blue-950" style="text-shadow: -2px -2px 0 white, 2px -2px 0 white, -2px 2px 0 white, 2px 2px 0 white, -2px 0 0 white, 2px 0 0 white, 0 -2px 0 white, 0 2px 0 white;">cribb.</span>
     </a>
 
-    <!-- Navigation Buttons (Center) -->
-    <div class="flex items-center space-x-3">
+    <!-- Navigation Buttons (Center) - Hidden on mobile, visible on tablet+ -->
+    <div class="hidden md:flex items-center space-x-3">
       <a routerLink="/dashboard/chores" class="nav-pill" routerLinkActive="active">
         chores
       </a>
@@ -18,27 +19,37 @@
       <a routerLink="/dashboard/shopping-cart" class="nav-pill" routerLinkActive="active">
         shopping cart
       </a>
+
+      <a routerLink="/dashboard/group" class="nav-pill" routerLinkActive="active">
+        group
+      </a>
     </div>
 
     <!-- Right side: Notifications and Profile -->
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-2">
       <!-- Notification Bell -->
-      <button class="text-blue-950 bg-white rounded-full p-1 border-2 border-blue-950 hover:text-gray-300 transition-colors">
-        <svg class="w-5 h-5 fill-blue-950" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-3.403-3.403A2.953 2.953 0 0116 12.5V9a4 4 0 00-8 0v3.5a2.953 2.953 0 01-.597 1.796L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-        </svg>
-      </button>
+      <app-notification-dropdown #notificationDropdown></app-notification-dropdown>
       
       <!-- Profile Menu -->
-      <div class="relative">
-        <button 
+      <div class="relative hidden md:block">
+        <!-- <button 
           type="button" 
-          class="w-8 h-8 rounded-full bg-blue-500 text-white font-medium text-sm hover:bg-blue-600 transition-colors flex items-center justify-center" 
+          class="w-7 h-7 rounded-full bg-blue-500 text-white font-medium text-xs hover:bg-blue-600 transition-colors flex items-center justify-center" 
           id="user-menu-button" 
           aria-expanded="false" 
           (click)="toggleMenu()"
         >
           {{ userName.charAt(0) }}
+        </button> -->
+        <button
+          type="button"
+          class="relative text-blue-950 bg-white rounded-full w-9 h-9 border-2 border-blue-950 hover:text-gray-300 transition-colors flex items-center justify-center"
+          id="user-menu-button"
+          aria-expanded="false"
+          (click)="toggleMenu()"
+          aria-label="User menu"
+        >
+          <ng-icon strokeWidth="3" name="iconoirUser" class="h-6 w-6"></ng-icon>
         </button>
         
         <!-- Dropdown menu -->
@@ -61,11 +72,11 @@
             </li>
             <li>
               <a 
-                routerLink="/profile" 
+                routerLink="/dashboard/group" 
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 (click)="toggleMenu()"
               >
-                Profile
+                Group
               </a>
             </li>
             <li>
@@ -82,3 +93,57 @@
     </div>
   </div>
 </nav>
+
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50">
+  <div class="bg-white shadow-2xl border-t-2 border-blue-950 w-full">
+    <div class="flex items-center justify-evenly px-3 py-1">
+      <!-- Chores Icon -->
+      <a routerLink="/dashboard/chores" class="mobile-bottom-nav-item" routerLinkActive="mobile-bottom-nav-active" #choresLink="routerLinkActive">
+        <div class="w-10 h-10 rounded-full bg-white border-2 border-blue-950 flex items-center justify-center">
+          <ng-icon strokeWidth="3" name="iconoirClipboardCheck" class="w-4 h-4" [class.text-white]="choresLink.isActive" [class.text-blue-950]="!choresLink.isActive"></ng-icon>
+        </div>
+      </a>
+      
+      <!-- Pantry Icon -->
+      <a routerLink="/dashboard/pantry" class="mobile-bottom-nav-item" routerLinkActive="mobile-bottom-nav-active" #pantryLink="routerLinkActive">
+        <div class="w-10 h-10 rounded-full bg-white border-2 border-blue-950 flex items-center justify-center">
+          <ng-icon strokeWidth="3" name="iconoirGarage" class="w-4 h-4" [class.text-white]="pantryLink.isActive" [class.text-blue-950]="!pantryLink.isActive"></ng-icon>
+        </div>
+      </a>
+      
+      <!-- Shopping Cart Icon -->
+      <a routerLink="/dashboard/shopping-cart" class="mobile-bottom-nav-item" routerLinkActive="mobile-bottom-nav-active" #cartLink="routerLinkActive">
+        <div class="w-10 h-10 rounded-full bg-white border-2 border-blue-950 flex items-center justify-center">
+          <ng-icon strokeWidth="3" name="iconoirCart" class="w-4 h-4" [class.text-white]="cartLink.isActive" [class.text-blue-950]="!cartLink.isActive"></ng-icon>
+        </div>
+      </a>
+      
+      <!-- Profile Icon (Bottom) -->
+      <a routerLink="/dashboard/group"
+         id="bottom-user-menu-button"
+         class="mobile-bottom-nav-item focus:outline-none"
+         routerLinkActive="mobile-bottom-nav-active"
+         #groupLink="routerLinkActive"
+         (click)="toggleMenu(); $event.preventDefault()">
+        <div class="w-10 h-10 rounded-full bg-white border-2 border-blue-950 flex items-center justify-center">
+          <ng-icon strokeWidth="3" name="iconoirUser" class="w-4 h-4" [class.text-white]="groupLink.isActive" [class.text-blue-950]="!groupLink.isActive"></ng-icon>
+        </div>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Slide-up Profile Menu (Mobile) -->
+<div id="bottom-profile-menu"
+     class="md:hidden fixed bottom-20 right-3 z-50 w-48 bg-white rounded-lg shadow-lg border-2 border-blue-950 transform transition-all duration-300 ease-out origin-bottom pointer-events-auto"
+     [ngClass]="{'opacity-0 scale-95 pointer-events-none': !isMenuOpen, 'opacity-100 scale-100': isMenuOpen}">
+  <ul class="py-2">
+    <li class="px-4 py-2 hover:bg-gray-100 text-sm">
+      <a routerLink="/dashboard/group" (click)="toggleMenu()">Group</a>
+    </li>
+    <li class="px-4 py-2 hover:bg-gray-100 text-sm">
+      <button (click)="signOut(); toggleMenu();" class="w-full text-left">Sign out</button>
+    </li>
+  </ul>
+</div>

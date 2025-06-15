@@ -397,10 +397,95 @@ export class ApiService {
 
   setUser(user: any): void {
     this.userSubject.next(user); // Update shared user state
+    try {
+      localStorage.setItem('user_data', JSON.stringify(user));
+    } catch {}
   }
 
   getUser(): any {
     return this.userSubject.value; // Get current user value
+  }
+
+  /**
+   * Join a group using the unique group code (preferred flow for existing accounts)
+   * @param groupCode Unique code of the group to join
+   * @param roomNo    Room/flat number of the user inside the household
+   */
+  joinGroupByCode(groupCode: string, roomNo: string): Observable<any> {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+
+    if (this.isSimulatedMode) {
+      // Simulated response – simply attach the groupCode and roomNo to user
+      const updatedUser = {
+        ...currentUser,
+        groupCode: groupCode,
+        groupName: 'SimHouse',
+        roomNo: roomNo
+      } as User;
+      localStorage.setItem('user_data', JSON.stringify(updatedUser));
+      this.currentUserSubject.next(updatedUser);
+      return of({ success: true, user: updatedUser }).pipe(delay(800));
+    }
+
+    const headers = this.getAuthHeaders();
+    return this.http.post<any>(`${this.baseUrl}/api/groups/join`, {
+      username: currentUser.email,
+      groupCode,
+      roomNo
+    }, { headers }).pipe(
+      tap(response => {
+        // Persist updated user information returned by backend
+        if (response && response.user) {
+          localStorage.setItem('user_data', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Leave the current group. The backend will nullify groupCode, groupName and roomNo.
+   * @param carryForward Whether the user wishes to keep their accumulated points
+   */
+  leaveGroup(carryForward: boolean = true): Observable<any> {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+
+    if (this.isSimulatedMode) {
+      const updatedUser = {
+        ...currentUser,
+        groupCode: undefined,
+        groupName: undefined,
+        roomNo: ''
+      } as User;
+      localStorage.setItem('user_data', JSON.stringify(updatedUser));
+      this.currentUserSubject.next(updatedUser);
+      return of({ success: true, user: updatedUser }).pipe(delay(600));
+    }
+
+    const headers = this.getAuthHeaders();
+    return this.http.post<any>(`${this.baseUrl}/api/groups/leave`, {
+      username: currentUser.email,
+      carryForward
+    }, { headers }).pipe(
+      tap(() => {
+        const updatedUser = {
+          ...currentUser,
+          groupCode: undefined,
+          groupName: undefined,
+          roomNo: ''
+        } as User;
+        localStorage.setItem('user_data', JSON.stringify(updatedUser));
+        this.currentUserSubject.next(updatedUser);
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // Generic error handler

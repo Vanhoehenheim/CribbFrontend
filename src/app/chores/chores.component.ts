@@ -4,6 +4,11 @@ import { ApiService } from '../services/api.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChoreService, Chore, RecurringChore } from '../services/chore.service';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { 
+  iconoirCheck, 
+  iconoirTrash 
+} from '@ng-icons/iconoir';
 
 
 /**
@@ -16,7 +21,11 @@ import { ChoreService, Chore, RecurringChore } from '../services/chore.service';
   templateUrl: './chores.component.html',
   styleUrl: './chores.component.css',
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, NgIcon],
+  providers: [provideIcons({ 
+    iconoirCheck, 
+    iconoirTrash 
+  })]
 })
 export class ChoresComponent implements OnInit {
   // Core data collections
@@ -55,6 +64,14 @@ export class ChoresComponent implements OnInit {
   
   // Available household members for assignments
   availableRoommates: {id: string, name: string, username: string}[] = [];
+  
+  // NEW: Celebration popup state
+  showCelebration = false;             // Controls visibility of celebration modal
+  celebrationPoints = 0;               // Points earned on completion
+  
+  // ===== DELETE CONFIRMATION MODAL =====
+  deleteChoreIdForConfirm: string | null = null;
+  showDeleteConfirm = false;
   
   constructor(
     private apiService: ApiService,     // Service for user and auth operations
@@ -184,6 +201,11 @@ export class ChoresComponent implements OnInit {
     this.choreService.completeChore(choreId, currentUser.id).subscribe({
       next: (response) => {
         console.log(`Chore completed! Earned ${response.points_earned} points. New score: ${response.new_score}`);
+        // Show celebration popup with earned points
+        this.celebrationPoints = response.points_earned;
+        this.showCelebration = true;
+        // Auto-hide after a few seconds
+        setTimeout(() => this.showCelebration = false, 5000);
         // Reload chores to get updated list after completion
         this.loadGroupChores();
       },
@@ -524,5 +546,61 @@ export class ChoresComponent implements OnInit {
       case 'monthly': return 'Monthly';
       default: return frequency;
     }
+  }
+  
+  // NEW: Close celebration popup manually
+  closeCelebration(): void {
+    this.showCelebration = false;
+  }
+  
+  clearCompletedChores(): void {
+    if (!this.user) return;
+    if (!confirm('Are you sure you want to remove all completed chores?')) {
+      return;
+    }
+    this.choreService.clearCompletedChores(this.user.groupName).subscribe({
+      next: (res) => {
+        console.log(`Deleted ${res.deleted_count} completed chores`);
+        // Refresh list
+        this.loadGroupChores();
+        // Switch away from completed tab if nothing remains
+        this.activeTab = 'all';
+      },
+      error: (error) => {
+        console.error('Error clearing completed chores:', error);
+        this.error = 'Failed to clear completed chores. Please try again.';
+        setTimeout(() => this.error = null, 3000);
+      }
+    });
+  }
+  
+  /** Open confirmation modal */
+  openDeleteConfirm(choreId: string): void {
+    this.deleteChoreIdForConfirm = choreId;
+    this.showDeleteConfirm = true;
+  }
+
+  /** Cancel deletion */
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+    this.deleteChoreIdForConfirm = null;
+  }
+
+  /** Confirm deletion */
+  confirmDelete(): void {
+    if (!this.deleteChoreIdForConfirm) { return; }
+    const id = this.deleteChoreIdForConfirm;
+    this.showDeleteConfirm = false;
+    this.deleteChoreIdForConfirm = null;
+    this.choreService.deleteChore(id).subscribe({
+      next: () => {
+        this.chores = this.chores.filter(c => c.id !== id);
+      },
+      error: (error) => {
+        console.error('Error deleting chore:', error);
+        this.error = 'Failed to delete chore. Please try again.';
+        setTimeout(() => this.error = null, 3000);
+      }
+    });
   }
 }

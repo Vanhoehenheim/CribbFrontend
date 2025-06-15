@@ -1,0 +1,174 @@
+<!-- Mobile-optimized container with glass morphism styling matching pantry component -->
+<div class="bg-white md:rounded-xl border-0 md:border-2 border-blue-950 p-3 md:p-5 mb-20 md:mb-0">
+  
+  <!-- ===== LOADING STATE ===== -->
+  <div *ngIf="loadingGroup()" class="flex justify-center items-center p-6 md:p-8">
+    <div class="animate-spin rounded-full h-8 w-8 md:h-10 md:w-10 border-t-2 border-b-2 border-[#578FCA]"></div>
+  </div>
+
+  <!-- ===== ERROR MESSAGE ===== -->
+  <div
+    *ngIf="error()"
+    class="bg-blue-950/10 backdrop-blur-sm border border-blue-950/30 text-blue-950 px-3 md:px-4 py-2 md:py-3 rounded-lg mx-2 md:mx-4 my-3 md:my-4 text-sm md:text-base"
+    role="alert"
+  >
+    <span class="block sm:inline font-medium">⚠️ {{ error() }}</span>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div *ngIf="!loadingGroup() && !error()" class="p-1 md:p-3">
+    
+    <!-- Single Card containing Group Info, User Info, and Leaderboard -->
+    <div class="p-3 md:p-5 transition-all duration-200 border-0 md:border-2 rounded-xl md:border-blue-950 mt-2 md:mt-3 bg-blue-200/50 md:bg-blue-200/20 flex flex-col">
+      
+      <!-- Top Section: Group Info (Left) and User Info (Right) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-6 md:mb-8 max-w-6xl mx-auto">
+        
+        <!-- Group Info Section (Left) -->
+        <div *ngIf="groupDetails() as group" class="text-center">
+          <h1 class="text-2xl md:text-3xl font-bold text-blue-950 font-loopet mb-4">{{ group.name }}</h1>
+          
+          <!-- Group stats -->
+          <div class="flex justify-center items-center gap-4 md:gap-6">
+            <div class="text-center">
+              <div class="text-[#578FCA] font-bold text-base md:text-lg">{{ group.group_code }}</div>
+              <div class="text-blue-950/70 font-medium text-xs md:text-sm">Group Code</div>
+            </div>
+            <div class="text-center">
+              <div class="text-[#578FCA] font-bold text-base md:text-lg">{{ group.member_count }}</div>
+              <div class="text-blue-950/70 font-medium text-xs md:text-sm">Members</div>
+            </div>
+            <div class="text-center">
+              <div class="text-[#578FCA] font-bold text-base md:text-lg">{{ group.total_points }}</div>
+              <div class="text-blue-950/70 font-medium text-xs md:text-sm">Total Points</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Info Section (Right) -->
+        <div class="text-center">
+          <h3 class="text-2xl md:text-3xl font-bold text-blue-950 font-loopet mb-4">{{ user()?.firstName }} {{ user()?.lastName }}</h3>
+          
+          <!-- User metadata in horizontal layout -->
+          <div class="flex justify-center items-center gap-4 md:gap-6">
+            <div class="text-center">
+              <div class="text-[#578FCA] font-bold text-base md:text-lg">{{ user()?.phone || 'N/A' }}</div>
+              <div class="text-blue-950/70 font-medium text-xs md:text-sm">Phone</div>
+            </div>
+            <div class="text-center">
+              <div class="text-[#578FCA] font-bold text-base md:text-lg">{{ user()?.roomNo || 'N/A' }}</div>
+              <div class="text-blue-950/70 font-medium text-xs md:text-sm">Room</div>
+            </div>
+            <div class="text-center">
+              <div class="text-[#578FCA] font-bold text-base md:text-lg">{{ user()?.score ?? '—' }}</div>
+              <div class="text-blue-950/70 font-medium text-xs md:text-sm">Score</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Section (Bottom) -->
+      <div class="border-t border-blue-950/20 pt-6 md:pt-8">
+        <div class="text-center mb-4">
+          <div class="flex items-center justify-center gap-2 mb-3">
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <h2 class="text-xl md:text-2xl font-bold text-blue-950 font-loopet">Leaderboard</h2>
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          </div>
+          <div class="w-16 h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full mx-auto mb-4"></div>
+        </div>
+
+        <!-- Leaderboard entries -->
+        <div class="space-y-2 md:space-y-3" *ngIf="leaderboard().length > 0; else noLeaderboard">
+          <div *ngFor="let member of leaderboard(); index as idx"
+               class="group bg-white/60 backdrop-blur-sm rounded-lg border border-blue-950/20 p-3 md:p-4 shadow-sm hover:shadow-md hover:bg-white/70 transition-all duration-200 transform hover:-translate-y-0.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <!-- Rank circle -->
+                <div class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-white shadow-md text-sm md:text-base"
+                     [ngClass]="{
+                       'bg-gradient-to-br from-yellow-400 to-yellow-600': idx === 0,
+                       'bg-gradient-to-br from-gray-300 to-gray-500': idx === 1,
+                       'bg-gradient-to-br from-orange-400 to-orange-600': idx === 2,
+                       'bg-gradient-to-br from-blue-400 to-blue-600': idx > 2
+                     }">
+                  <span *ngIf="idx === 0">👑</span>
+                  <span *ngIf="idx !== 0">{{ idx + 1 }}</span>
+                </div>
+                
+                <!-- Member info -->
+                <div>
+                  <div class="font-bold text-blue-950 text-sm md:text-base">{{ member.name }}</div>
+                  <div *ngIf="idx === 0" class="text-yellow-600 font-medium text-xs">🏆 Champion</div>
+                </div>
+              </div>
+              
+              <!-- Points badge -->
+              <div class="bg-[#578FCA] text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold shadow-sm text-xs md:text-sm">
+                {{ member.score }} <span class="text-blue-200 text-xs">Points</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noLeaderboard>
+          <div class="text-center py-6 md:py-8 bg-blue-200/20 backdrop-blur-sm border-2 border-blue-950/20 rounded-xl mx-2 md:mx-4 my-4 md:my-6">
+            <!-- Trophy icon -->
+            <div class="mb-4 md:mb-6 flex justify-center">
+              <div class="bg-white/30 backdrop-blur-sm border border-blue-950/30 rounded-full p-3 md:p-4 shadow-lg">
+                <svg class="w-8 h-8 md:w-12 md:h-12 text-blue-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+              </div>
+            </div>
+            
+            <h3 class="text-xl md:text-2xl font-bold font-loopet text-blue-950 mb-2 md:mb-3">No leaderboard data available yet!</h3>
+            <p class="text-blue-950/80 mb-4 md:mb-6 text-base md:text-lg font-medium px-2">Complete some chores to see group rankings appear here.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Leave Group Button directly under card -->
+<div class="mt-6 flex justify-center md:justify-end">
+  <button
+    (click)="openLeaveModal()"
+    class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-full shadow-lg flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+    </svg>
+    Leave Group
+  </button>
+</div>
+
+<!-- Leave Group Confirmation Modal -->
+<div id="leave-group-modal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="relative w-full max-w-sm md:max-w-md bg-white/95 backdrop-blur-lg border-2 border-blue-950 rounded-2xl shadow-2xl p-6 md:p-8 text-center overflow-hidden">
+    <!-- Close button -->
+    <button (click)="closeLeaveModal()" class="absolute top-3 right-3 p-2 hover:bg-blue-950/10 rounded-full transition-all duration-200">
+      <svg class="w-5 h-5 text-blue-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <h3 class="text-xl md:text-2xl fancy font-bold font-loopet text-blue-950 mb-4">Leave Group</h3>
+    <p class="text-blue-950 text-base md:text-lg font-medium mb-4">Are you sure you want to leave your current household group?</p>
+    <p class="text-blue-950 text-base md:text-lg font-medium mb-6">You can choose to keep your accumulated points.</p>
+
+    <label class="inline-flex items-center gap-2 mb-6 text-sm md:text-base font-medium text-blue-950">
+      <input type="checkbox" [(ngModel)]="carryForward" class="w-4 h-4 text-[#578FCA] bg-gray-100 border-blue-950 rounded focus:ring-[#578FCA] focus:ring-2">
+      Carry forward my points
+    </label>
+
+    <div class="flex justify-center space-x-3 md:space-x-4">
+      <button type="button" (click)="closeLeaveModal()" class="btn btn-sm px-4 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950 backdrop-blur-sm text-sm md:text-base">Cancel</button>
+      <button type="button" (click)="confirmLeave()" class="btn btn-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">Leave Group</button>
+    </div>
+  </div>
+</div> 

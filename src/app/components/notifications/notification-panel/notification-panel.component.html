@@ -1,51 +1,41 @@
-<div class="w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg overflow-hidden">
-    <!-- Header with tabs -->
-    <div class="border-b border-gray-200 dark:border-gray-700">
-      <div class="flex">
-        <button 
-          [ngClass]="{'border-blue-500 text-blue-500': activeTab === 'pantry', 'text-gray-500': activeTab !== 'pantry'}"
-          class="flex-1 py-3 px-4 text-sm font-medium border-b-2"
-          (click)="switchTab('pantry')"
-        >
-          Pantry
-        </button>
-        <!--
-        <button 
-          [ngClass]="{'border-blue-500 text-blue-500': activeTab === 'chores', 'text-gray-500': activeTab !== 'chores'}"
-          class="flex-1 py-3 px-4 text-sm font-medium border-b-2"
-          (click)="switchTab('chores')"
-        >
-          Chores (Coming Soon)
-        </button>
-        -->
-      </div>
+<!-- Notification panel with responsive sizing -->
+<div class="w-full md:w-80 bg-white/90 backdrop-blur-md rounded-xl shadow-xl border-2 border-blue-950 overflow-hidden">
+    <!-- Header with responsive padding -->
+    <div class="p-3 md:p-4 border-b-2 border-blue-950/20">
+      <h2 class="text-lg md:text-xl font-bold font-loopet text-blue-950 text-center">Pantry</h2>
     </div>
 
-    <!-- Pantry notifications -->
-    <div *ngIf="activeTab === 'pantry'">
+    <!-- Pantry notifications with responsive height -->
+    <div>
       <!-- Show notifications or empty state -->
-      <div *ngIf="notifications.length > 0" class="max-h-80 overflow-y-auto">
+      <div *ngIf="notifications.length > 0" class="max-h-60 md:max-h-80 overflow-y-auto p-2 md:p-3">
         <app-notification-item 
           *ngFor="let notification of notifications" 
           [notification]="notification"
-          (markAsRead)="markAsRead($event)"
-          (delete)="deleteNotification($event)"
+          (markAsRead)="onMarkAsRead($event)"
+          (delete)="onDeleteNotification($event)"
         ></app-notification-item>
       </div>
       
-      <!-- Empty state -->
-      <div *ngIf="notifications.length === 0" class="p-4 text-center text-gray-500 dark:text-gray-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-        </svg>
-        <p>No new notifications</p>
+      <!-- Empty state with responsive sizing -->
+      <div *ngIf="notifications.length === 0" class="p-6 md:p-8 text-center">
+        <!-- Notification icon with glass morphism background -->
+        <div class="mb-3 md:mb-4 flex justify-center">
+          <div class="bg-white/30 backdrop-blur-sm border border-blue-950/30 rounded-full p-2 md:p-3 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8 text-blue-950/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 9h6v6H9V9zm0 0V3h6v6H9z" />
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-base md:text-lg font-bold font-loopet text-blue-950 mb-2">No new notifications</h3>
+        <p class="text-blue-950/70 text-sm">You're all caught up!</p>
       </div>
       
-      <!-- Footer with Show All button -->
-      <div class="p-2 border-t border-gray-200 dark:border-gray-700">
-        <button 
-          class="w-full py-2 px-4 text-sm font-medium text-center text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors"
-          (click)="navigateToAll()"
+      <!-- Footer with responsive button -->
+      <div class="p-2 md:p-3 border-t-2 border-blue-950/20 bg-white/10">
+        <button
+          class="w-full py-2 md:py-2.5 px-3 md:px-4 text-sm font-semibold text-center text-white bg-[#578FCA] hover:bg-[#578FCA]/80 rounded-lg transition-all duration-200 shadow-lg border-2 border-blue-950/20 backdrop-blur-sm transform hover:scale-105 active:scale-95 touch-manipulation"
+          (click)="onNavigateToAll()"
         >
           Show All
         </button>
@@ -61,4 +51,4 @@
       <p>Chores notifications coming soon</p>
     </div>
     -->
-  </div>
+</div>

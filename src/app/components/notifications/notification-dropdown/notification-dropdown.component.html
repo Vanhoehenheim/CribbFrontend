@@ -1,20 +1,42 @@
 <div class="relative">
   <!-- Bell icon with notification count badge -->
-  <button 
-    class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
+  <button
+    class="relative text-blue-950 bg-white rounded-full w-9 h-9 border-2 border-blue-950 hover:text-gray-300 transition-colors flex items-center justify-center"
     (click)="toggleDropdown($event)"
     aria-label="View notifications"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-    </svg>
-    
-    <!-- Badge showing unread count -->
-    <span 
+    <!-- Iconoir Bell Icon -->
+    <ng-icon name="iconoirBellNotification" class="h-6 w-6"></ng-icon>
+
+    <!-- Badge showing unread count (numeric) -->
+    <span
       *ngIf="unreadCount > 0"
-      class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full"
+      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full shadow-md min-w-[16px] h-4"
     >
       {{ unreadCount > 9 ? '9+' : unreadCount }}
     </span>
   </button>
+</div>
+
+<!-- Notification Overlay (positioned below navbar with lighter blur) -->
+<div 
+  *ngIf="isDropdownOpen"
+  class="fixed top-16 left-0 right-0 bottom-0 z-30 bg-black/20 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none"
+  (click)="closeDropdown()"
+>
+  <!-- Notification Panel positioned from top -->
+  <div class="absolute top-2 left-4 right-4 md:top-2 md:left-auto md:right-6 md:w-80">
+    <div 
+      class="bg-white/95 backdrop-blur-md rounded-xl shadow-xl border-2 border-blue-950 overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Include notification panel component directly -->
+      <app-notification-panel
+        (closeDropdown)="closeDropdown()"
+        (markAsReadClicked)="markAsRead($event)"
+        (deleteNotificationClicked)="deleteNotification($event)"
+        (navigateToAllClicked)="navigateToAllNotifications()"
+      ></app-notification-panel>
+    </div>
+  </div>
 </div>

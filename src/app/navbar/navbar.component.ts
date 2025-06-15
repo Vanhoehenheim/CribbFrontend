@@ -3,11 +3,30 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ApiService } from '../services/api.service';
 import { NotificationDropdownComponent } from '../components/notifications/notification-dropdown/notification-dropdown.component';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { 
+    iconoirClipboardCheck, 
+  iconoirBox, 
+  iconoirCart, 
+  iconoirProfileCircle,
+  iconoirUser,
+  iconoirBellNotification,
+  iconoirGarage
+} from '@ng-icons/iconoir';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, NotificationDropdownComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, NotificationDropdownComponent, NgIcon],
+  providers: [provideIcons({ 
+    iconoirProfileCircle, 
+    iconoirUser,
+    iconoirBox, 
+    iconoirCart, 
+    iconoirClipboardCheck,
+    iconoirBellNotification,
+    iconoirGarage
+  })],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
@@ -22,14 +41,10 @@ export class NavbarComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit() {
-    // Check if notification dropdown component was successfully loaded
+    // Check if notification dropdown loaded (for debugging)
     setTimeout(() => {
-      if (this.notificationDropdown) {
-        console.log('Notification dropdown component loaded successfully');
-      } else {
-        console.error('Notification dropdown component not found');
-      }
-    }, 1000);
+      console.log('Notification dropdown:', this.notificationDropdown);
+    });
   }
 
   toggleMenu() {
@@ -40,9 +55,19 @@ export class NavbarComponent implements AfterViewInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    const dropdown = document.querySelector('#user-menu-button')?.parentElement;
-    
-    if (dropdown && !dropdown.contains(target)) {
+
+    // Elements for top profile menu
+    const topButton = document.getElementById('user-menu-button');
+    const topMenu = topButton?.nextElementSibling;
+
+    // Elements for bottom slide-up menu
+    const bottomButton = document.getElementById('bottom-user-menu-button');
+    const bottomMenu = document.getElementById('bottom-profile-menu');
+
+    const clickedInsideTop = topButton && (topButton.contains(target) || (topMenu && topMenu.contains(target)));
+    const clickedInsideBottom = bottomButton && (bottomButton.contains(target) || (bottomMenu && bottomMenu.contains(target)));
+
+    if (!clickedInsideTop && !clickedInsideBottom) {
       this.isMenuOpen = false;
     }
   }
@@ -56,13 +81,5 @@ export class NavbarComponent implements AfterViewInit {
   get userName(): string {
     const user = this.apiService.getCurrentUser();
     return user ? `${user.firstName} ${user.lastName}` : 'User';
-  }
-  
-  // For debugging - manually toggle the notification dropdown
-  debugToggleNotifications(event: MouseEvent) {
-    if (this.notificationDropdown) {
-      this.notificationDropdown.toggleDropdown(event);
-      console.log('Manually toggled notifications dropdown');
-    }
   }
 }

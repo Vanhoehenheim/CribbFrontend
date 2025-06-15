@@ -1,1 +1,115 @@
-/* Add custom styles for notification item component if needed */ 
+/* Add custom styles for notification item component if needed */
+
+/* Mobile-friendly styles for notification items */
+
+/* Enhanced touch targets for mobile */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+  
+  /* Larger touch targets for action buttons */
+  .btn-sm {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0.625rem;
+  }
+  
+  /* Better spacing for mobile */
+  .notification-actions {
+    gap: 0.5rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .hover\:bg-blue-950:hover {
+    background-color: initial;
+  }
+  
+  /* Add active states for touch */
+  .hover\:bg-blue-950:active {
+    background-color: rgb(23 37 84);
+    color: white;
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Scale effect for touch feedback */
+  .btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-in-out;
+  }
+}
+
+/* Responsive modal styles */
+@media (max-width: 640px) {
+  .modal-content {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  
+  /* Stack modal buttons on very small screens */
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+/* Improved focus styles for accessibility */
+.btn:focus-visible {
+  outline: 2px solid #578FCA;
+  outline-offset: 2px;
+}
+
+/* Better text sizing for readability on mobile */
+@media (max-width: 768px) {
+  .notification-item h3 {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .notification-item p {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
+/* Smooth transitions for better UX */
+.notification-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.notification-item:active {
+  transform: scale(0.98);
+}
+
+/* Ensure add to cart modal appears above everything else */
+.add-to-cart-modal-overlay {
+  z-index: 99999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  pointer-events: auto !important;
+  /* Ensure it's not affected by parent transform contexts */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* Force modal content to be above everything */
+.add-to-cart-modal-overlay > div {
+  z-index: 100000 !important;
+  position: relative !important;
+} 

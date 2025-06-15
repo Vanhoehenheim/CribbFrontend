@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Overlay, OverlayRef, OverlayConfig, OverlayModule } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { iconoirBellNotification } from '@ng-icons/iconoir';
 
 import { NotificationService } from '../../../services/notification.service';
 import { Notification } from '../../../models/notification.model';
@@ -12,20 +12,21 @@ import { NotificationPanelComponent } from '../notification-panel/notification-p
 @Component({
   selector: 'app-notification-dropdown',
   standalone: true,
-  imports: [CommonModule, RouterModule, OverlayModule],
+  imports: [CommonModule, RouterModule, NotificationPanelComponent, NgIcon],
+  providers: [provideIcons({ iconoirBellNotification })],
   templateUrl: './notification-dropdown.component.html',
   styleUrls: ['./notification-dropdown.component.css']
 })
 export class NotificationDropdownComponent implements OnInit, OnDestroy {
   unreadCount = 0;
-  private overlayRef: OverlayRef | null = null;
   private subscription = new Subscription();
+  
+  isDropdownOpen = false;
+  notifications: Notification[] = [];
 
   constructor(
     private notificationService: NotificationService,
-    private router: Router,
-    private overlay: Overlay,
-    private viewContainerRef: ViewContainerRef
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +34,13 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.notificationService.unreadCount$.subscribe(count => {
         this.unreadCount = count;
+      })
+    );
+    
+    // Subscribe to notifications
+    this.subscription.add(
+      this.notificationService.notifications$.subscribe(notifications => {
+        this.notifications = notifications;
       })
     );
     
@@ -44,65 +52,39 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    this.closeDropdown();
   }
 
   toggleDropdown(event: MouseEvent): void {
     event.stopPropagation();
     
-    if (this.overlayRef) {
-      this.closeDropdown();
-    } else {
-      // Simply open the dropdown - the panel will subscribe to notifications
-      this.openDropdown(event);
-      
-      // Trigger a single fetch in the background
+    this.isDropdownOpen = !this.isDropdownOpen;
+
+    if (this.isDropdownOpen) {
+      // Trigger a fetch when opening
       this.notificationService.fetchNotifications().subscribe();
     }
   }
 
-  private openDropdown(event: MouseEvent): void {
-    const target = event.currentTarget as HTMLElement;
-    
-    // Configure the overlay
-    const config: OverlayConfig = {
-      hasBackdrop: true,
-      backdropClass: 'cdk-overlay-transparent-backdrop',
-      positionStrategy: this.overlay.position()
-        .flexibleConnectedTo(target)
-        .withPositions([{
-          originX: 'end',
-          originY: 'bottom',
-          overlayX: 'end',
-          overlayY: 'top',
-          offsetY: 8
-        }])
-    };
-    
-    // Create overlay
-    this.overlayRef = this.overlay.create(config);
-    
-    // Handle backdrop clicks to close
-    this.overlayRef.backdropClick().subscribe(() => this.closeDropdown());
-    
-    // Create portal for content
-    const portal = new ComponentPortal(NotificationPanelComponent, this.viewContainerRef);
-    const componentRef = this.overlayRef.attach(portal);
-    
-    // Pass data to panel component
-    const panelComponent = componentRef.instance;
-    panelComponent.closeDropdown.subscribe(() => this.closeDropdown());
+  markAsRead(notificationId: string): void {
+    this.notificationService.markAsRead(notificationId).subscribe(() => {
+      // Refresh after action
+      this.notificationService.fetchNotifications().subscribe();
+    });
   }
 
-  closeDropdown(): void {
-    if (this.overlayRef) {
-      this.overlayRef.dispose();
-      this.overlayRef = null;
-    }
+  deleteNotification(notificationId: string): void {
+    this.notificationService.deleteNotification(notificationId).subscribe(() => {
+      // Refresh after action
+      this.notificationService.fetchNotifications().subscribe();
+    });
   }
 
   navigateToAllNotifications(): void {
-    this.router.navigate(['/dashboard'], { fragment: 'pantry' });
-    this.closeDropdown();
+    this.router.navigate(['/dashboard/pantry']);
+    this.isDropdownOpen = false;
+  }
+
+  closeDropdown(): void {
+    this.isDropdownOpen = false;
   }
 }

@@ -8,7 +8,7 @@ export interface PantryItem {
   name: string;                 // Name of the pantry item
   quantity: number;             // Current quantity of the item
   unit: string;                 // Unit of measurement (e.g., lbs, oz, each)
-  category: string;             // Category classification (e.g., Dairy, Produce)
+  category_id: string;          // Category ObjectID (required)
   expiration_date?: string;     // Optional date when item expires
   added_by: string;             // ID of user who added the item
   created_at: string;           // Creation timestamp
@@ -17,6 +17,16 @@ export interface PantryItem {
   is_expired?: boolean;         // Flag for expired items
   added_by_name?: string;       // Display name of user who added the item
   selectedQuantity?: number;    // UI state for quantity selector
+  category_info?: CategoryInfo; // Resolved category information
+}
+
+/**
+ * Category information returned with pantry items
+ */
+export interface CategoryInfo {
+  id: string;                   // Category ObjectID
+  name: string;                 // Category display name
+  type: 'predefined' | 'custom'; // Category type
 }
 
 /**
@@ -26,7 +36,7 @@ export interface AddPantryItemRequest {
   name: string;                 // Name of the item
   quantity: number;             // Initial quantity
   unit: string;                 // Unit of measurement
-  category?: string;            // Optional category
+  category_id: string;          // Required category ObjectID
   expiration_date?: string;     // Optional expiration date
   group_name: string;           // Name of the household group
 }
@@ -38,7 +48,7 @@ export interface UpdatePantryItemRequest {
   name: string;                 // Name of the item
   quantity: number;             // Updated quantity
   unit: string;                 // Unit of measurement
-  category?: string;            // Optional category
+  category_id: string;          // Required category ObjectID
   expiration_date?: string;     // Optional expiration date
   group_name: string;           // Name of the household group
 }
