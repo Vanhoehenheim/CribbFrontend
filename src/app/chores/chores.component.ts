@@ -7,7 +7,8 @@ import { ChoreService, Chore, RecurringChore } from '../services/chore.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { 
   iconoirCheck, 
-  iconoirTrash 
+  iconoirTrash, 
+  iconoirEditPencil 
 } from '@ng-icons/iconoir';
 
 
@@ -24,7 +25,8 @@ import {
   imports: [CommonModule, FormsModule, NgIcon],
   providers: [provideIcons({ 
     iconoirCheck, 
-    iconoirTrash 
+    iconoirTrash, 
+    iconoirEditPencil 
   })]
 })
 export class ChoresComponent implements OnInit {
@@ -70,8 +72,12 @@ export class ChoresComponent implements OnInit {
   celebrationPoints = 0;               // Points earned on completion
   
   // ===== DELETE CONFIRMATION MODAL =====
-  deleteChoreIdForConfirm: string | null = null;
+  deleteChoreForConfirm: Chore | null = null; // The chore selected for deletion
   showDeleteConfirm = false;
+  
+  // ===== EDITING STATE =====
+  editingMode = false;                       // True when editing an existing chore
+  editingChore: Chore | null = null;         // The chore currently being edited
   
   constructor(
     private apiService: ApiService,     // Service for user and auth operations
@@ -459,6 +465,8 @@ export class ChoresComponent implements OnInit {
     
     this.isRecurringChore = false;
     this.showNewChoreForm = false;
+    this.editingMode = false;
+    this.editingChore = null;
   }
   
   /**
@@ -575,23 +583,23 @@ export class ChoresComponent implements OnInit {
   }
   
   /** Open confirmation modal */
-  openDeleteConfirm(choreId: string): void {
-    this.deleteChoreIdForConfirm = choreId;
+  openDeleteConfirm(chore: Chore): void {
+    this.deleteChoreForConfirm = chore;
     this.showDeleteConfirm = true;
   }
 
   /** Cancel deletion */
   cancelDelete(): void {
     this.showDeleteConfirm = false;
-    this.deleteChoreIdForConfirm = null;
+    this.deleteChoreForConfirm = null;
   }
 
-  /** Confirm deletion */
-  confirmDelete(): void {
-    if (!this.deleteChoreIdForConfirm) { return; }
-    const id = this.deleteChoreIdForConfirm;
+  /** Delete only this instance */
+  confirmDeleteInstance(): void {
+    if (!this.deleteChoreForConfirm) { return; }
+    const id = this.deleteChoreForConfirm.id;
     this.showDeleteConfirm = false;
-    this.deleteChoreIdForConfirm = null;
+    this.deleteChoreForConfirm = null;
     this.choreService.deleteChore(id).subscribe({
       next: () => {
         this.chores = this.chores.filter(c => c.id !== id);
@@ -602,5 +610,135 @@ export class ChoresComponent implements OnInit {
         setTimeout(() => this.error = null, 3000);
       }
     });
+  }
+
+  /** Delete the recurring template (and pending instances) */
+  confirmDeleteRecurring(): void {
+    if (!this.deleteChoreForConfirm || this.deleteChoreForConfirm.type !== 'recurring') { return; }
+    const recurringId = this.deleteChoreForConfirm.recurring_id || this.deleteChoreForConfirm.id;
+    this.showDeleteConfirm = false;
+    this.deleteChoreForConfirm = null;
+    this.choreService.deleteRecurringChore(recurringId).subscribe({
+      next: () => {
+        // Remove any chores linked to this recurring template
+        this.chores = this.chores.filter(c => c.recurring_id !== recurringId && c.id !== recurringId);
+        // Remove template from list
+        this.recurringChores = this.recurringChores.filter(rc => rc.id !== recurringId);
+      },
+      error: (error) => {
+        console.error('Error deleting recurring chore:', error);
+        this.error = 'Failed to delete recurring chore. Please try again.';
+        setTimeout(() => this.error = null, 3000);
+      }
+    });
+  }
+
+  /**
+   * Open the edit chore modal pre-filled with the chore's details.
+   */
+  openEditChore(chore: Chore): void {
+    this.editingMode = true;
+    this.editingChore = chore;
+    this.showNewChoreForm = true;
+    this.isRecurringChore = chore.type === 'recurring';
+
+    if (this.isRecurringChore) {
+      // Populate recurring form
+      this.newRecurringChore = {
+        title: chore.title,
+        description: chore.description,
+        frequency: (this.recurringChores.find(rc => rc.id === (chore.recurring_id || ''))?.frequency || 'weekly') as 'daily' | 'weekly' | 'biweekly' | 'monthly',
+        points: chore.points
+      };
+    } else {
+      // Populate individual form
+      const roommate = this.availableRoommates.find(r => r.id === chore.assigned_to) ||
+                       this.availableRoommates.find(r => r.username === chore.assigned_to);
+
+      this.newIndividualChore = {
+        title: chore.title,
+        description: chore.description,
+        assigned_to: roommate ? roommate.username : chore.assigned_to,
+        due_date: this.formatDate(new Date(chore.due_date)),
+        points: chore.points
+      };
+    }
+  }
+
+  /**
+   * Decide whether to create a new chore or update an existing one based on editingMode flag.
+   */
+  submitChoreForm(): void {
+    if (this.editingMode) {
+      this.updateExistingChore();
+    } else {
+      this.createNewChore();
+    }
+  }
+
+  /**
+   * Update an existing chore (individual or recurring).
+   */
+  private updateExistingChore(): void {
+    if (!this.editingChore) { return; }
+
+    if (this.isRecurringChore) {
+      // Update recurring chore template
+      this.choreService.updateRecurringChore({
+        recurring_chore_id: this.editingChore.recurring_id || this.editingChore.id,
+        title: this.newRecurringChore.title,
+        description: this.newRecurringChore.description,
+        frequency: this.newRecurringChore.frequency,
+        points: this.newRecurringChore.points
+      }).subscribe({
+        next: (updated) => {
+          // Update local collections
+          const idx = this.chores.findIndex(c => c.id === this.editingChore!.id);
+          if (idx !== -1) {
+            this.chores[idx] = { ...this.chores[idx], ...updated } as any;
+          }
+          const rIdx = this.recurringChores.findIndex(rc => rc.id === updated.id);
+          if (rIdx !== -1) {
+            this.recurringChores[rIdx] = updated;
+          }
+          this.resetChoreForm();
+        },
+        error: (error) => {
+          console.error('Error updating recurring chore:', error);
+          this.error = 'Failed to update chore. Please try again.';
+          setTimeout(() => this.error = null, 3000);
+        }
+      });
+    } else {
+      // Update individual chore
+      // Convert due_date to ISO at 00:00 next day similar to create logic
+      const selectedDate = new Date(this.newIndividualChore.due_date);
+      selectedDate.setDate(selectedDate.getDate() + 1);
+      selectedDate.setHours(0, 0, 0, 0);
+      const dueDateISO = selectedDate.toISOString();
+
+      this.choreService.updateChore({
+        chore_id: this.editingChore.id,
+        title: this.newIndividualChore.title,
+        description: this.newIndividualChore.description,
+        assigned_to: this.newIndividualChore.assigned_to,
+        due_date: dueDateISO,
+        points: this.newIndividualChore.points
+      }).subscribe({
+        next: (updated) => {
+          // Replace in local list
+          const idx = this.chores.findIndex(c => c.id === updated.id);
+          if (idx !== -1) {
+            this.chores[idx] = updated;
+          }
+          this.resetChoreForm();
+        },
+        error: (error) => {
+          console.error('Error updating chore:', error);
+          this.error = 'Failed to update chore. Please try again.';
+          setTimeout(() => this.error = null, 3000);
+        }
+      });
+    }
   }
 }
