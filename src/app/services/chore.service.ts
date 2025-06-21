@@ -227,6 +227,7 @@ export class ChoreService {
     group_name: string;
     frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
     points: number;
+    member_usernames?: string[];
   }): Observable<RecurringChore> {
     if (this.isSimulatedMode) {
       const mockRecurringChore: RecurringChore = {
@@ -307,6 +308,7 @@ export class ChoreService {
     frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly';
     points?: number;
     is_active?: boolean;
+    member_usernames?: string[];
   }): Observable<RecurringChore> {
     if (this.isSimulatedMode) {
       const mockRecurringChore: RecurringChore = {

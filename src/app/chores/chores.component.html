@@ -237,6 +237,33 @@
               </p>
             </div>
 
+            <!-- Participants Field -->
+            <div class="md:col-span-2 relative">
+              <label class="block text-sm font-bold text-blue-950 mb-2">Participants (Rotate Among)</label>
+
+              <!-- Display / Toggle Button -->
+              <button type="button"
+                      (click)="toggleParticipantDropdown($event)"
+                      class="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-blue-950/30 rounded-xl shadow-sm bg-white/60 backdrop-blur-sm text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-[#578FCA] focus:border-[#578FCA] text-blue-950 font-medium transition-all duration-200 text-sm md:text-base">
+                <span [ngClass]="{'text-blue-950/50': selectedParticipants.length === 0}">{{ selectedParticipantsDisplay }}</span>
+                <svg class="w-4 h-4 text-blue-950 transform transition-transform duration-200" [ngClass]="{'rotate-180': participantDropdownOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown -->
+              <div *ngIf="participantDropdownOpen" class="absolute z-50 left-0 w-full mt-1 max-h-48 overflow-y-auto bg-white/95 backdrop-blur-lg border-2 border-blue-950/30 rounded-xl shadow-xl p-2 space-y-1">
+                <label *ngFor="let roommate of availableRoommates" (click)="$event.stopPropagation()" class="flex items-center space-x-2 px-2 py-1 hover:bg-blue-100 rounded cursor-pointer">
+                  <input type="checkbox" [value]="roommate.username" (change)="onParticipantToggle(roommate.username, $event)" [checked]="selectedParticipants.includes(roommate.username)" class="accent-[#578FCA] w-4 h-4 border-blue-950/50 rounded"/>
+                  <span class="text-sm text-blue-950 font-medium">{{ roommate.name }}</span>
+                </label>
+              </div>
+
+              <p class="text-xs md:text-sm text-blue-950/80 mt-2 font-medium">
+                Choose any roommates to include in the rotation. Leave empty to include everyone.
+              </p>
+            </div>
+
             <!-- Points Field -->
             <div class="md:col-span-1">
               <label class="block text-sm font-bold text-blue-950 mb-2">Points</label>
@@ -581,17 +608,17 @@
     </p>
 
     <div class="flex flex-col md:flex-row justify-center gap-2 md:gap-4">
-      <button type="button" (click)="cancelDelete()" class="btn btn-sm px-4 py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950 backdrop-blur-sm text-sm md:text-base">Cancel</button>
+      <button type="button" (click)="cancelDelete()" class="btn btn-sm px-2 py-1 md:px-4 md:py-2 bg-white/30 hover:bg-white/50 text-blue-950 border-blue-950 backdrop-blur-sm text-sm md:text-base">Cancel</button>
 
       <!-- Delete options for recurring chores -->
       <ng-container *ngIf="deleteChoreForConfirm?.type === 'recurring'; else singleDeleteBtns">
-        <button type="button" (click)="confirmDeleteInstance()" class="btn btn-sm px-4 py-2 bg-red-500 hover:bg-red-600 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">This Instance</button>
-        <button type="button" (click)="confirmDeleteRecurring()" class="btn btn-sm px-4 py-2 bg-red-700 hover:bg-red-800 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">Entire Series</button>
+        <button type="button" (click)="confirmDeleteInstance()" class="btn btn-sm px-2 py-1 md:px-4 md:py-2 bg-red-500 hover:bg-red-600 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">This Instance</button>
+        <button type="button" (click)="confirmDeleteRecurring()" class="btn btn-sm px-2 py-1 md:px-4 md:py-2 bg-red-700 hover:bg-red-800 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">Entire Series</button>
       </ng-container>
 
       <!-- Delete button for single chores -->
       <ng-template #singleDeleteBtns>
-        <button type="button" (click)="confirmDeleteInstance()" class="btn btn-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">Delete</button>
+        <button type="button" (click)="confirmDeleteInstance()" class="btn btn-sm px-2 py-1 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 text-white border-blue-950 backdrop-blur-sm text-sm md:text-base">Delete</button>
       </ng-template>
     </div>
   </div>

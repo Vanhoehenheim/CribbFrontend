@@ -43,6 +43,7 @@ export class ChoresComponent implements OnInit {
   // Create new chore UI state
   showNewChoreForm = false;            // Controls visibility of new chore form
   isRecurringChore = false;            // Toggle between individual and recurring chore
+  selectedParticipants: string[] = [];
   
   // Form data for new individual chore
   newIndividualChore = {
@@ -79,11 +80,26 @@ export class ChoresComponent implements OnInit {
   editingMode = false;                       // True when editing an existing chore
   editingChore: Chore | null = null;         // The chore currently being edited
   
+  participantDropdownOpen = false;
+  
+  // Helper to display selected participant names
+  get selectedParticipantsDisplay(): string {
+    if (this.selectedParticipants.length === 0) return 'Select participants';
+    const names = this.availableRoommates
+      .filter(r => this.selectedParticipants.includes(r.username))
+      .map(r => r.name);
+    return names.join(', ');
+  }
+  
   constructor(
     private apiService: ApiService,     // Service for user and auth operations
     private choreService: ChoreService,  // Service for chore CRUD operations
     private router: Router           // Angular router for navigation
-  ) {}
+  ) {
+    document.addEventListener('click', () => {
+      this.participantDropdownOpen = false;
+    });
+  }
   
   /**
    * Initialize the component by loading chores, recurring templates,
@@ -339,19 +355,22 @@ export class ChoresComponent implements OnInit {
     // Show loading indicator during creation
     this.loading = true;
     
+    const participants = this.selectedParticipants.length > 0 ? this.selectedParticipants : this.availableRoommates.map(r => r.username);
+    
     const choreData = {
       title: this.newRecurringChore.title,
       description: this.newRecurringChore.description,
       group_name: this.user.groupName,
       frequency: this.newRecurringChore.frequency,
-      points: this.newRecurringChore.points
+      points: this.newRecurringChore.points,
+      member_usernames: participants
     };
     
     this.choreService.createRecurringChore(choreData).subscribe({
       next: (newRecurringChore) => {
         console.log('Recurring chore created successfully!');
         
-        // Add the recurring template to the collection
+        if (!this.recurringChores) { this.recurringChores = []; }
         this.recurringChores.unshift(newRecurringChore);
         
         // Create a temporary chore instance for immediate UI feedback
@@ -374,7 +393,7 @@ export class ChoresComponent implements OnInit {
           recurring_id: newRecurringChore.id
         };
         
-        // Add temporary instance to local collection for immediate display
+        if (!this.chores) { this.chores = []; }
         this.chores.unshift(newChoreInstance);
         
         // Reset UI state
@@ -467,6 +486,7 @@ export class ChoresComponent implements OnInit {
     this.showNewChoreForm = false;
     this.editingMode = false;
     this.editingChore = null;
+    this.selectedParticipants = [];
   }
   
   /**
@@ -650,6 +670,11 @@ export class ChoresComponent implements OnInit {
         frequency: (this.recurringChores.find(rc => rc.id === (chore.recurring_id || ''))?.frequency || 'weekly') as 'daily' | 'weekly' | 'biweekly' | 'monthly',
         points: chore.points
       };
+
+      // Attempt to prefill participants (best-effort using availableRoommates)
+      this.selectedParticipants = this.availableRoommates
+        .filter(r => r.id === chore.assigned_to || r.username === chore.assigned_to)
+        .map(r => r.username);
     } else {
       // Populate individual form
       const roommate = this.availableRoommates.find(r => r.id === chore.assigned_to) ||
@@ -689,13 +714,27 @@ export class ChoresComponent implements OnInit {
         title: this.newRecurringChore.title,
         description: this.newRecurringChore.description,
         frequency: this.newRecurringChore.frequency,
-        points: this.newRecurringChore.points
+        points: this.newRecurringChore.points,
+        member_usernames: this.selectedParticipants
       }).subscribe({
         next: (updated) => {
+          // Ensure status and display name are correct after update
+          const now = new Date();
+          const due = new Date((updated as any).due_date);
+          if (due >= now) {
+            (updated as any).status = 'pending';
+          }
+
+          const room = this.availableRoommates.find(r => r.id === (updated as any).assigned_to) ||
+                       this.availableRoommates.find(r => r.username === (updated as any).assigned_to);
+          if (room) {
+            (updated as any).assignee_name = room.name;
+          }
+
           // Update local collections
           const idx = this.chores.findIndex(c => c.id === this.editingChore!.id);
           if (idx !== -1) {
-            this.chores[idx] = { ...this.chores[idx], ...updated } as any;
+            this.chores[idx] = updated as any;
           }
           const rIdx = this.recurringChores.findIndex(rc => rc.id === updated.id);
           if (rIdx !== -1) {
@@ -726,10 +765,23 @@ export class ChoresComponent implements OnInit {
         points: this.newIndividualChore.points
       }).subscribe({
         next: (updated) => {
-          // Replace in local list
-          const idx = this.chores.findIndex(c => c.id === updated.id);
+          // Ensure status and display name are correct after update
+          const now = new Date();
+          const due = new Date((updated as any).due_date);
+          if (due >= now) {
+            (updated as any).status = 'pending';
+          }
+
+          const room = this.availableRoommates.find(r => r.id === (updated as any).assigned_to) ||
+                       this.availableRoommates.find(r => r.username === (updated as any).assigned_to);
+          if (room) {
+            (updated as any).assignee_name = room.name;
+          }
+
+          // Update local collections
+          const idx = this.chores.findIndex(c => c.id === this.editingChore!.id);
           if (idx !== -1) {
-            this.chores[idx] = updated;
+            this.chores[idx] = updated as any;
           }
           this.resetChoreForm();
         },
@@ -740,5 +792,25 @@ export class ChoresComponent implements OnInit {
         }
       });
     }
+  }
+
+  onParticipantToggle(username: string, event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    event.stopPropagation();
+    const checked = !!input?.checked;
+
+    if (checked) {
+      if (!this.selectedParticipants.includes(username)) {
+        this.selectedParticipants.push(username);
+      }
+    } else {
+      this.selectedParticipants = this.selectedParticipants.filter(u => u !== username);
+    }
+  }
+
+  // Add toggle method
+  toggleParticipantDropdown(e: Event): void {
+    e.stopPropagation();
+    this.participantDropdownOpen = !this.participantDropdownOpen;
   }
 }
