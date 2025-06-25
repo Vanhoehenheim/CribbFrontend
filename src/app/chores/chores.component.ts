@@ -299,10 +299,9 @@ export class ChoresComponent implements OnInit {
     }
     console.log(this.user.groupName)
     
-    // Calculate the due_date as the UTC start of the next day to cover the full selected day locally
+    // Calculate the due_date as the end (23:59) of the selected local day so the user has the full day to complete it
     const selectedDate = new Date(this.newIndividualChore.due_date);
-    selectedDate.setDate(selectedDate.getDate() + 1);
-    selectedDate.setHours(0, 0, 0, 0);
+    selectedDate.setHours(23, 59, 0, 0);
     const dueDateISO = selectedDate.toISOString();
 
     const choreData = {
@@ -357,13 +356,19 @@ export class ChoresComponent implements OnInit {
     
     const participants = this.selectedParticipants.length > 0 ? this.selectedParticipants : this.availableRoommates.map(r => r.username);
     
+    // Compute first_due_date as end of local day, expressed in UTC ISO string
+    const firstDue = new Date();
+    firstDue.setHours(23, 59, 0, 0);
+    const firstDueISO = firstDue.toISOString();
+
     const choreData = {
       title: this.newRecurringChore.title,
       description: this.newRecurringChore.description,
       group_name: this.user.groupName,
       frequency: this.newRecurringChore.frequency,
       points: this.newRecurringChore.points,
-      member_usernames: participants
+      member_usernames: participants,
+      first_due_date: firstDueISO
     };
     
     this.choreService.createRecurringChore(choreData).subscribe({
@@ -373,20 +378,18 @@ export class ChoresComponent implements OnInit {
         if (!this.recurringChores) { this.recurringChores = []; }
         this.recurringChores.unshift(newRecurringChore);
         
-        // Create a temporary chore instance for immediate UI feedback
-        const currentUser = this.apiService.getCurrentUser();
-        const username = currentUser ? 
-          `${currentUser.firstName.toLowerCase()}_${currentUser.lastName.toLowerCase()}` : 
-          (this.availableRoommates.length > 0 ? this.availableRoommates[0].username : 'john_doe');
-        
-        // Create temporary chore instance with UI-only ID
+        // Create a temporary chore instance with UI-only ID. The due date is set
+        // to the end of the current local day (23:59) to mirror the backend logic.
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 0, 0);
+
         const newChoreInstance: any = {
           id: 'chore' + Date.now(),
           title: newRecurringChore.title,
           description: newRecurringChore.description,
           group_name: this.user.groupName,
-          assigned_to: username,
-          due_date: new Date().toISOString(),
+          assigned_to: participants[0],
+          due_date: endOfDay.toISOString(),
           points: newRecurringChore.points,
           status: 'pending',
           type: 'recurring',
