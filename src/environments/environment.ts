@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://cribbbackend-production.up.railway.app'
+  apiUrl: 'https://cribb-backend-14585909240.us-east1.run.app'
 }; 

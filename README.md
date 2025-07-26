@@ -1,59 +1,94 @@
-# CribbFrontend
+# Cribb Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
+Cribb is an open-source roommate-management platform that helps apartment groups coordinate **chores**, **shared pantry inventory**, and **shopping lists** in one place.  
 
-## Development server
+This repository contains the **mobile-first Angular&nbsp;19** client.
 
-To start a local development server, run:
+> The REST API lives in `/CribbBackend` and is written in Go 1.23.
+
+---
+
+## UI Feature Highlights
+
+* 🗂 **Dashboard-first** interface showing upcoming chores, low-stock pantry items, and group activity at a glance.
+* 📱 **Mobile-first, responsive** layout powered by Tailwind CSS – looks great on phones, tablets, and desktops.
+* ⏰ **Smart Chore Board** with one-time & recurring chores, auto-rotation, reminders, and gamified leaderboards.
+* 📦 **Categorised Pantry** view with consumption tracking, expiry warnings, and low-stock notifications.
+* 🛒 **Shared Shopping Cart** that syncs in real-time across housemates and provides an activity feed.
+* 🔔 **Notification Center** (dropdown, badge & panel components) for consolidated alerts across the app.
+* 🌐 **Instant search & filtering** within chores, pantry items, and shopping cart.
+* ⚡️ **Offline-friendly PWA** thanks to Angular service-worker caching.
+
+---
+
+## Quick Start
 
 ```bash
+# 1. install deps
+npm install
+
+# 2. start local dev server (http://localhost:4200)
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The client automatically reloads when you edit a source file.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Scripts
 
-```bash
-ng generate component component-name
-```
+| Command                 | Purpose                               |
+| ----------------------- | ------------------------------------- |
+| `ng serve`              | Development server + live reload      |
+| `ng build`              | Production build → `dist/`            |
+| `ng test`               | Unit tests with Karma + Jasmine       |
+| `ng e2e`                | Cypress end-to-end tests              |
+| `npm run lint`          | ESLint over `src/`                    |
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## Architecture & Key Concepts
 
-## Building
+| Layer            | Details |
+| ---------------- | ------- |
+| **Standalone Components** | All feature areas (`chores`, `pantry`, `shopping-cart`, …) are implemented as *standalone* Angular components for faster lazy-loading and simplified module management. |
+| **Signals & RxJS** | Some services (e.g. `shopping-cart.service.ts`) use Angular **Signals** for state, while others expose classic RxJS `BehaviorSubject`s. |
+| **NgIcons + Iconoir** | Consistent iconography via `@ng-icons/iconoir`; icons are provided locally in each component to keep bundle size low. |
+| **Tailwind CSS** | Design system is enforced with Tailwind utility classes plus small SCSS helpers. |
+| **Cypress** | End-to-end flows are covered by Cypress specs in `cypress/`. |
 
-To build the project run:
+---
 
-```bash
-ng build
-```
+## Environments
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+API calls default to `http://localhost:8080`. Override using **environment files** in `src/environments/` or by setting `NG_APP_API_URL` when deploying.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Code Scaffolding
 
 ```bash
-ng e2e
+ng generate component feature/MyAwesomeCmp         # standalone by default
+ng generate service  services/my-awesome           # providedIn:'root'
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Use `ng generate --help` for the full schematic list.
 
-## Additional Resources
+---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Build & Deploy
+
+1. `ng build --configuration production` → static assets in `dist/cribb-frontend/`.
+2. Deploy to any static host (e.g. Vercel, Netlify). A ready-made `vercel.json` is included for zero-config Vercel deploys.
+
+---
+
+## Contributing
+
+Pull requests are welcome! Please follow the existing code-style (ESLint + Prettier) and ensure unit tests & Cypress suites pass.
+
+---
+
+## License
+
+Cribb Frontend is released under the **MIT License**. See `LICENSE` for details.
