@@ -638,7 +638,16 @@ export class ChoresComponent implements OnInit {
   /** Delete the recurring template (and pending instances) */
   confirmDeleteRecurring(): void {
     if (!this.deleteChoreForConfirm || this.deleteChoreForConfirm.type !== 'recurring') { return; }
-    const recurringId = this.deleteChoreForConfirm.recurring_id || this.deleteChoreForConfirm.id;
+    
+    // For recurring chores, we need the recurring template ID, not the instance ID
+    const recurringId = this.deleteChoreForConfirm.recurring_id;
+    if (!recurringId) {
+      console.error('Cannot delete recurring chore: missing recurring_id');
+      this.error = 'Unable to delete recurring chore. Missing recurring ID.';
+      setTimeout(() => this.error = null, 3000);
+      return;
+    }
+    
     this.showDeleteConfirm = false;
     this.deleteChoreForConfirm = null;
     this.choreService.deleteRecurringChore(recurringId).subscribe({
